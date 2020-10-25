@@ -12,7 +12,8 @@
         
 **Create virtualenv**
 
-        python3 -m venv /path/to/new/virtual/environment
+        python3 -m venv .
+        source venv/bin/activate
         
 **Install libraries**
 
