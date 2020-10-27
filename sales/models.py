@@ -4,7 +4,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from customers.models import Customer
 from coupons.models import Coupon
-from users.models import Staff
+from users.models import User
 from products.models import ProductItem
 
 
@@ -23,7 +23,7 @@ class Invoice(models.Model):
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
     product_items = GenericRelation(ProductItem, related_query_name='invoice')
 
 
@@ -41,5 +41,5 @@ class Order(models.Model):
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
     product_items = GenericRelation(ProductItem, related_query_name='order')

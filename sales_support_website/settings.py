@@ -107,9 +107,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# User model
+# Custom User model
 
-AUTH_USER_MODEL = 'users.Staff'
+AUTH_USER_MODEL = 'users.User'
 
 
 # Internationalization
@@ -117,7 +117,7 @@ AUTH_USER_MODEL = 'users.Staff'
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
