@@ -1,0 +1,5 @@
+<div id="cart" class="cart w-100">
+    {% for pitem in list_items %}
+        {% include 'sales/product_item.html' with product=pitem.product quantity=pitem.quantity index=forloop.counter %}
+    {% endfor %}
+</div>

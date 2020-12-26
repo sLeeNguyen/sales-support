@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, UserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -53,6 +53,10 @@ class UserManager(BaseUserManager):
 
         return self._create_user(username, password, **extra_fields)
 
+    def find_by_username(self, username):
+        query_set = self.get_queryset()
+        return query_set.filter(username=username)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
@@ -76,7 +80,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last name'), max_length=150, blank=True, null=True)
     gender = models.IntegerField(_('gender'), default=0, choices=constants.GENDER_CHOICES)
     birthday = models.DateField(_('birthday'), blank=True, null=True)
-    phone_number = models.CharField(_('phone number'), max_length=13, blank=True)
+    phone_number = models.CharField(_('phone number'), max_length=13, blank=True, null=True)
     is_active = models.BooleanField(  # can login
         _('active'),
         default=True,
@@ -107,3 +111,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """Return the short name for the user."""
         return self.first_name
+
+    def get_display_name(self):
+        """Return the display name for the user. If it empty return username instead"""
+        if self.display_name:
+            return self.display_name
+
+        return self.username

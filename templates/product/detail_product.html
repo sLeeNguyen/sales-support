@@ -1,0 +1,115 @@
+{% load humanize %}
+
+<div class="container box-product-detail bg-white br-5 p-3 mt-5">
+    <div class="d-flex justify-content-end">
+        <button id="btn-close" class="btn btn-outline-info"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="row">
+        <div class="col py-2">
+            <span class="product-name">Tên sản phẩm: {{ product.product_name }}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 left d-flex mt-3">
+            <div class="img-show mr-2">
+                <a id="img-show-link" class="d-flex" href="" target="_blank"><img id="img-show"></a>
+            </div>
+            <div class="list-img-thumb">
+                <ul>
+                {% for img_url in list_imgs %}
+                    <li class="img-thumb"><img src="{{ img_url }}"></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-8 right">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Mã hàng:</label>
+                        <div class="col-md-7 pl-0">
+                            <span><strong>{{ product.product_code }}</strong></span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Mã vạch:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.barcode }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Nhóm hàng:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.category.category_name }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Giá nhập:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.cost_price|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Giá bán:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.sell_price|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Ngày sản xuất:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.mfg|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center mb-4">
+                        <label class="col-md-5 col-form-label pl-0">Ngày hết hạn:</label>
+                        <div class="col-md-7 pl-0">
+                            <span>{{ product.exp|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-4 col-form-label pl-0">Trạng thái:</label>
+                        <div class="col-md-8 pl-0">
+                            <span><strong>{{ product.get_status_display }}</strong></span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-4 col-form-label pl-0">Tồn kho:</label>
+                        <div class="col-md-8 pl-0">
+                            <span>{{ product.get_available|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group d-flex align-items-center bb-1 mb-4">
+                        <label class="col-md-4 col-form-label pl-0">Đơn vị:</label>
+                        <div class="col-md-8 pl-0">
+                            <span>{{ product.get_unit_display }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="col-form-label w-100 bb-1 mb-2">Mô tả:</label>
+                        <div class="text">
+                            <span>{{ product.description }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end py-3">
+        <button id="partial-update-btn" type="button" class="btn btn-success px-3 mr-3">
+            <i class="fas fa-edit mr-2"></i>
+            Cập nhật
+        </button>
+        <button id="partial-stop-sell-btn" type="button" class="btn btn-danger px-3">
+            <i class="fas fa-ban mr-2"></i>
+            Ngừng bán
+        </button>
+        <button id="partial-delete-btn" type="button" class="btn btn-danger px-3 ml-3">
+            <i class="fas fa-trash-alt mr-2"></i>
+            Xoá
+        </button>
+    </div>
+    <div id="product-meta" dataId="{{product.id}}" hidden></div>
+</div>

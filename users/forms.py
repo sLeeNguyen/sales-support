@@ -80,6 +80,8 @@ class UserAdminChangeForm(forms.ModelForm):
     def clean_birthday(self):
         # Check that the birthday is not in the past
         birthday = self.cleaned_data.get('birthday')
+        if birthday is None:
+            return
         if birthday.day > timezone.now().day:
             raise forms.ValidationError("Birthday must be in the past")
         return birthday

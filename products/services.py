@@ -7,92 +7,7 @@ from django.db.models import Q
 fields = ['product_code', 'product_name', 'sell_price', 'cost_price', 'available']
 
 
-# define exceptions
-class CategoryNotExistsError(ObjectDoesNotExist):
-    pass
-
-
-class ProductAlreadyExistsError(Exception):
-    pass
-
-
-class ProductNotExistsError(Exception):
-    pass
-
-
 class ProductServices:
-    def __init__(self, product_code, product_name, sell_price, available, category_name,
-                 barcode='',
-                 description='',
-                 cost_price=0,
-                 unit=Product.UNIT_INT,
-                 status=1,
-                 mfg=None,
-                 exp=None
-                 ):
-        self._product_code = product_code
-        self._product_name = product_name
-        self._barcode = barcode
-        self._description = description
-        self._cost_price = cost_price
-        self._sell_price = sell_price
-        self._available = available
-        self._unit = unit
-        self._status = status
-        self._mfg = mfg
-        self._exp = exp
-        self._category = self.find_category(category_name=category_name)
-
-    def execute(self):
-        """
-        This function will validate data.
-        New product will be created if there is no error
-        """
-        self.valid_data()
-        product = Product.objects.create(
-            product_code=self._product_code,
-            barcode=self._barcode,
-            product_name=self._product_name,
-            description=self._description,
-            cost_price=self._cost_price,
-            sell_price=self._sell_price,
-            available=self._available,
-            unit=self._unit,
-            status=self._status,
-            mfg=self._mfg,
-            exp=self._exp,
-            category=self._category
-        )
-        return product
-
-    def valid_data(self):
-        """
-        Valid product name and code, if exists, an error will be thrown
-        """
-        if self._product_code:
-            product_qs = Product.objects.find_by_code(product_code=self._product_code)
-            if product_qs.exists():
-                error_msg = (
-                    "Mã sản phẩm '{}' đã tồn tại".format(self._product_code)
-                )
-                raise ProductAlreadyExistsError(_(error_msg))
-
-        product_qs2 = Product.objects.find_by_name(product_name=self._product_name)
-        if product_qs2.exists():
-            error_msg = (
-                "Tên sản phẩm '{}' đã tồn tại".format(self._product_name)
-            )
-            raise ProductAlreadyExistsError(_(error_msg))
-
-    @classmethod
-    def find_category(cls, category_name):
-        try:
-            category = Category.objects.get(category_name=category_name)
-            return category
-        except ObjectDoesNotExist:
-            raise CategoryNotExistsError(
-                _("Nhóm hàng '{}' không tồn tại".format(category_name))
-            )
 
     @classmethod
     def get_products_datatables(cls, post):
@@ -100,12 +15,13 @@ class ProductServices:
         Get list products from database base on properties in POST request
         """
         start = int(post['start'])
-        length = int(post['length'])
-        field_order = fields[int(post['order[0][column]'])]
+        end = start + int(post['length'])
+        field_order = fields[int(post['order[0][column]']) - 1]
         order_type = post['order[0][dir]']
         search_val = post['search[value]']
+        product_status = int(post.get('productStatus', 1))
 
-        results = Product.objects.all()
+        results = Product.objects.filter(status=product_status)
         if search_val:
             results = results.filter(
                 Q(product_code__icontains=search_val) | Q(product_name__icontains=search_val)
@@ -114,4 +30,27 @@ class ProductServices:
             results = results.order_by(field_order)
         else:  # order_type = 'desc'
             results = results.order_by('-' + field_order)
-        return results[start:length]
+
+        # make response
+        data = []
+        for p in results[start:end]:
+            if p.unit == Product.UNIT_INT:
+                available = int(p.available)
+            else:
+                available = p.available
+            data.append({
+                "0": "",
+                "1": p.product_code,
+                "2": p.product_name,
+                "3": p.sell_price,
+                "4": p.cost_price,
+                "5": available,
+                "DT_RowId": p.id
+            })
+
+        return {
+            "draw": int(post['draw']),
+            "recordsTotal": results.count(),
+            "recordsFiltered": results.count(),
+            "data": data
+        }

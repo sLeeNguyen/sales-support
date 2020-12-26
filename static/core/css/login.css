@@ -186,7 +186,7 @@ iframe {
 
   width: 100%;
   display: block;
-  padding-bottom: 54px;
+  padding-bottom: 25px;
 }
 
 
@@ -426,4 +426,10 @@ iframe {
     visibility: visible;
     opacity: 1;
   }
+}
+
+.error {
+  color: #c80000;
+  font-size: 13px;
+  text-align: center;
 }
