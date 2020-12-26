@@ -1,0 +1,23 @@
+{% load static %}
+
+<header>
+	<div class="row align-items-center">
+		<div class="logo-side col-md-5">
+			<img src="{% static 'core/images/vietnam.svg' %}">
+			<span class="font-bold">Việt Nam</span>
+		</div>
+		<div class="additional-info col-md-7 d-flex justify-content-end">
+			<div class="block d-flex justify-content-center align-items-center">
+				<span class="user-display-name font-bold">Thiết lập</span>
+				<i class="fas fa-sliders-h"></i>
+			</div>
+			<div class="block d-flex justify-content-center align-items-center">
+				<span class="user-display-name font-bold">{{ user.get_display_name }}</span>
+				<i class="fas fa-user-circle"></i>
+			</div>
+			<div class="block d-flex justify-content-center align-items-center">
+				<i class="fas fa-bell ml-0 p-2"></i>
+			</div>
+		</div>
+	</div>
+</header>

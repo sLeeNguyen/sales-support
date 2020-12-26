@@ -1,0 +1,209 @@
+:root {
+    --main-bg-color: #0098be;
+    --main-font-size: 0.9375rem;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.hand {
+    cursor: pointer;
+}
+
+.bg-hover {
+    padding: 8px 10px;
+}
+
+.bg-hover:hover {
+    background-color: #00000026;
+    border-radius: 3px;
+}
+
+.header {
+    background-color: var(--main-bg-color);
+    height: 50px;
+    padding: 0px 20px;
+    display: flex;
+}
+
+.header-search .search-bar {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    position: relative;
+}
+
+.header-search .search-bar i {
+    position: absolute;
+    left: 5px;
+    color: #a1a7ad;
+}
+
+.search-bar .result {
+    position: absolute;
+    max-height: 500px;
+    background-color: white;
+    width: 100%;
+    top: 90%;
+    z-index: 9999;
+    box-shadow: 0 5px 15px #deddd9;
+    border-radius: 3px;
+    overflow-y: scroll;
+}
+
+.search-bar .result .product-avt img {
+    width: 80px;
+    height: 100%;
+    border-radius: 2px;
+    object-fit: cover;
+}
+
+.search-result-item {
+    margin-bottom: 1rem;
+}
+
+.search-result-item:hover {
+    background-color: var(--main-bg-color);
+    color: white !important;
+    border-radius: 3px;
+}
+
+.product-meta .product-name {
+    font-weight: bold;
+    font-size: var(--main-font-size);
+}
+
+.product-meta {
+    font-size: 0.8rem;
+}
+
+.header .tab-invoices {
+    overflow: hidden;
+}
+
+.header-search .search-bar input {
+    border-radius: 3px;
+    border: 1px cornsilk solid;
+    width: 100%;
+    padding: 7px 25px;
+    text-indent: 5px;
+    outline: none;
+    font-size: var(--main-font-size);
+}
+
+.tab-invoices .list-tab {
+    list-style: none;
+    display: flex;
+    height: 100%;
+}
+
+.tab-invoices .list-tab i {
+    font-size: 13px;
+    color: #a1a7ad;
+    visibility: hidden;
+}
+
+.tab-invoices .list-tab li:hover i {
+    visibility: inherit;
+    transition: 0.3s all;
+}
+
+.header-right {
+    color: white !important;
+}
+
+.header-right .more:hover {
+    background-color: #00000026;
+    border-radius: 3px;
+}
+
+.header-right .more i {
+    font-size: 1.3rem;
+}
+
+.header-right .user .username {
+    font-size: var(--main-font-size);
+}
+
+.sell-left {
+    background-color: #f1f0f0;
+}
+
+.sell-left .cart .remove-item {
+    color: #848484;
+}
+
+.sell-left .cart .product-item {
+    height: 70px;
+    background-color: white;
+    box-shadow: 0 5px 15px #deddd9;
+    border-radius: 5px;
+}
+
+.product-item .product-item-data {
+    font-size: var(--main-font-size) !important;
+}
+
+.product-item .product-item-data .subtotal {
+    font-weight: bold;
+}
+
+.product-item .product-item-data .product-quantity {
+    border-width: 0 0 1px 0;
+    border-color: #666666;
+    outline: none;
+}
+
+/*@media screen and (min-width: )*/
+
+@media screen and (min-width: 998px) {
+    .header .header-search {
+        width: 35%;
+        height: 100%;
+    }
+
+    .header .tab-invoices {
+        width: 40%;
+        height: 100%;
+    }
+
+    .header .header-right {
+        width: 25%;
+        height: 100%;
+    }
+
+    .tab-invoices .list-tab .invoice {
+        min-width: 100px;
+        background-color: white;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+        border-radius: 2px;
+        font-size: var(--main-font-size);
+    }
+
+    .sell-main {
+        height: 100%;
+    }
+
+    .sell-main .sell-left {
+        height: 100%;
+        width: 100%;
+    }
+
+    .sell-main .sell-right {
+        min-width: 300px;
+        background-color: #000;
+        height: 100%;
+    }
+}

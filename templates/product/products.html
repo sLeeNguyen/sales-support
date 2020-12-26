@@ -1,0 +1,449 @@
+{% extends "core/manage_base.html" %}
+{% load static %}
+
+{% block title %}
+<title>Products Management</title>
+{% endblock %}
+
+{% block manage_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'core/vendor/dataTables/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'core/vendor/dataTables/css/select.dataTables.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'core/css/product.css' %}">
+{% include 'core/notification_css_js.html' %}
+{% endblock %}
+
+{% block manage_left %}
+<div class="box-function">
+    <h6 class="p-2">Hàng hoá</h6>
+    <div class="sub-box-function pl-3 pr-3 pt-2 pb-3">
+        <div class="box-title d-flex mb-3">
+            <div class="title">Trạng thái hàng</div>
+            <i class="fas fa-chevron-up collapse-ic"></i>
+        </div>
+        <div class="option pl-2 pr-2">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="product-status" id="1" value="1" checked="checked">
+                <label class="form-check-label" for="1">
+                    Đang bán
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="product-status" id="2" value="2">
+                <label class="form-check-label" for="2">
+                    Ngừng bán
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<div class="box-function">-->
+<!--    <h6 class="p-2">Hàng hoá</h6>-->
+<!--    <div class="sub-box-function pl-3 pr-3 pt-2 pb-3">-->
+<!--        <div class="box-title d-flex mb-3">-->
+<!--            <div class="title">Trạng thái hàng</div>-->
+<!--            <i class="fas fa-chevron-up collapse-ic"></i>-->
+<!--        </div>-->
+<!--        <div class="option pl-2 pr-2">-->
+<!--            <div class="form-check mb-2">-->
+<!--                <input class="form-check-input" type="radio" name="exampleRadios" value="option1" checked>-->
+<!--                <label class="form-check-label">-->
+<!--                    Đang bán-->
+<!--                </label>-->
+<!--            </div>-->
+<!--            <div class="form-check">-->
+<!--                <input class="form-check-input" type="radio" name="exampleRadios" value="option2">-->
+<!--                <label class="form-check-label">-->
+<!--                    Ngừng bán-->
+<!--                </label>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+{% endblock %}
+
+{% block manage_right %}
+
+<table id="table_id" class="table table-hover table-bordered" style="width:100%">
+    <thead class="table-head">
+        <tr>
+            {% for column_name in table_columns %}
+            <th>{{ column_name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+</table>
+<div class="box-function my-3">
+<!--    <h6 class="p-2">Thao tác</h6>-->
+    <div class="sub-box-function d-flex justify-content-center mr-3 ml-3 pt-3 pb-3">
+        <div class="operation-box ml-3">
+            <button id="no-sell-btn" type="button" class="btn btn-danger px-3" title="Ngừng bán các sản phẩm đã chọn.">
+                <i class="fas fa-ban mr-2"></i>
+                Ngừng bán
+            </button>
+        </div>
+        <div class="operation-box ml-3">
+            <button id="delete-btn" type="button" class="btn btn-danger px-3 ml-3" title="Xoá các sản phẩm đã chọn.">
+                <i class="fas fa-trash-alt mr-2"></i>
+                Xoá
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block expand %}
+<div id="p-detail-update" class="product-detail-update" hidden></div>
+{% endblock %}
+
+{% block manage_js %}
+<script src="{% static 'core/vendor/dataTables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/vendor/dataTables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/vendor/dataTables/js/dataTables.select.min.js' %}"></script>
+<script src="{% static 'core/vendor/jquery-ui/jquery-ui.min.js' %}"></script>
+<script src="{% static 'core/vendor/js-validate/jquery.validate.min.js' %}"></script>
+<script src="{% static 'core/js/product.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var datatable = $('#table_id').DataTable({
+            processing: true,
+            serverSide: true,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Vietnamese.json",
+            },
+            columnDefs: [
+                {
+                    orderable: false,
+                    searchable: false,
+                    className: "select-checkbox",
+                    targets: 0,
+                },
+                {
+                    className: "p-field-info",
+                    targets: [1, 2, 3, 4, 5],
+                }
+            ],
+            select: {
+                style:    'multi',
+                selector: 'td:first-child'
+            },
+            order: [[2, 'asc']],
+            ajax: {
+                url: "{% url 'products:warehouse' %}",
+                type: "POST",
+                data: function(d) {
+                    d.productStatus = $('input[name="product-status"]:checked').val();
+                },
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            }
+        });
+
+        $('#table_id').on('init.dt', function () {
+            // Call datatables, and return the API to the variable for use in our code
+            // Binds datatables to all elements with a class of datatable
+            const dtable = $("#table_id").dataTable().api();
+
+            // Grab the datatables input box and alter how it is bound to events
+            $(".dataTables_filter input[type='search']")
+                .unbind() // Unbind previous default bindings
+                .bind("keyup", function(e) { // Bind our desired behavior
+                    // If the length is 3 or more characters, or the user pressed ENTER, search
+                    if(this.value.length >= 3 || e.keyCode == 13) {
+                        dtable.search(this.value).draw();
+                    }
+                    // Ensure we clear the search if they backspace far enough
+                    if(this.value == "") {
+                        dtable.search("").draw();
+                    }
+                    return;
+                });
+            $("th.select-checkbox").on("click", function(e) {
+                if (this.classList.contains("selected-all")) {
+                    dtable.rows().deselect();
+                } else {
+                    dtable.rows().select();
+                }
+                $(this).toggleClass('selected-all');
+            });
+
+
+        });
+
+        // add event when table redraw
+        datatable.on('draw', function() {
+            function show(html) {
+                $('#p-detail-update').empty();
+                $('#p-detail-update').append(html);
+                $('#p-detail-update').attr('hidden', false);
+
+                $('#btn-close').on('click', function() {
+                    $('#p-detail-update').empty();
+                    $('#p-detail-update').attr('hidden', true);
+                });
+            }
+            function changeImageShow(element) {
+                if ($('.img-thumb.active') != null) {
+                    $('.img-thumb.active').toggleClass('active');
+                }
+                $(element).toggleClass('active');
+                let child_src = $(element).children()[0].src;
+                $('#img-show').attr('src', child_src);
+                $('#img-show-link').attr('href', child_src);
+            }
+            function setUpPartialProductEvent(result, id) {
+                show(result);
+                changeImageShow($('.img-thumb')[0]);
+                $('.img-thumb').on('click', function() {
+                    changeImageShow(this);
+                });
+
+                $('#partial-update-btn').on('click', function() {
+                    $.ajax({
+                        url: "{% url 'products:product-update' %}" + id,
+                        type: "GET",
+                        success: function(result) {
+                            show(result);
+                            productFormSetUp();
+                            formCallAjax("#product-form", null, function() {
+                                $('#p-detail-update').empty();
+                                $('#p-detail-update').attr('hidden', true);
+                            });
+                        },
+                        error: function(err) {
+                            errorNotification({
+                                title: 'Lỗi'
+                            })
+                        }
+                    });
+                });
+
+                $('#partial-stop-sell-btn').on('click',function(e) {
+                    let r = confirm("Ngừng bán sản phẩm này?");
+                    if (r == true){
+                        $.ajax({
+                            url: "{% url 'products:product-update' %}" + id,
+                            type: 'PATCH',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                            success: function(result) {
+                                if (result["status"] == "success") {
+                                    $('#p-detail-update').empty();
+                                    $('#p-detail-update').attr('hidden', true);
+                                    successNotification({
+                                        message: "Thay đổi thành công",
+                                    })
+                                    datatable.draw();
+                                } else {
+                                    errorNotification({
+                                        title: "Thất bại!",
+                                    })
+                                }
+                            },
+                            error: function(err) {
+                                errorNotification({
+                                    title: 'Lỗi'
+                                })
+                            }
+                        });
+                    }
+                });
+
+                $('#partial-delete-btn').on('click',function(e) {
+                    let r = confirm("Bạn chắc chắn xoá?");
+                    if (r == true){
+                        $.ajax({
+                            url: "{% url 'products:product-update' %}" + id,
+                            type: 'DELETE',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                            },
+                            success: function(result) {
+                                if (result["status"] == "success") {
+                                    $('#p-detail-update').empty();
+                                    $('#p-detail-update').attr('hidden', true);
+                                    successNotification({
+                                        message: "Thay đổi thành công",
+                                    })
+                                    datatable.draw();
+                                } else {
+                                    errorNotification({
+                                        title: "Thất bại!",
+                                    })
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            $('#table_id tbody tr .p-field-info').on('click', function() {
+                let id = $(this).parent().attr('id');
+                $.ajax({
+                    url: "{% url 'products:product-detail' %}" + id,
+                    type: "GET",
+                    success: function(result) {
+                        setUpPartialProductEvent(result, id);
+                    }
+                });
+            });
+        });
+
+        $('#delete-btn').on('click', function(e) {
+            var list_ids = $(".selected").map((index, ele) => {
+                return $(ele).attr('id');
+            });
+            console.log(list_ids.toArray());
+
+            if (list_ids.length == 0) {
+                warningNotification({
+                    message: "Bạn chưa chọn sản phẩm nào",
+                });
+                return;
+            }
+
+            let r = confirm("Bạn chắc chắn xoá?");
+            if (r == true) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{% url 'products:product-update' %}",
+                    type: 'DELETE',
+                    data: {
+                        'list_ids': list_ids.toArray()
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function(result) {
+                        if (result["status"] == "success") {
+                            successNotification({
+                                title: "Thành công",
+                                message: "Đã xoá"
+                            })
+                            datatable.draw();
+                        } else {
+                            errorNotification({
+                                title: "Thất bại!",
+                            })
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#no-sell-btn').on('click', function(e) {
+            var list_ids = $(".selected").map((index, ele) => {
+                return $(ele).attr('id');
+            });
+            console.log(list_ids.toArray());
+
+            if (list_ids.length == 0) {
+                warningNotification({
+                    message: "Bạn chưa chọn sản phẩm nào",
+                });
+                return;
+            }
+
+            let r = confirm("Ngừng bán các sản phẩm đã chọn?");
+            if (r == true) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{% url 'products:product-update' %}",
+                    type: 'PATCH',
+                    data: {
+                        'list_ids': list_ids.toArray()
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function(result) {
+                        if (result["status"] == "success") {
+                            successNotification({
+                                title: "Thành công",
+                            })
+                            datatable.draw();
+                        } else {
+                            errorNotification({
+                                title: "Thất bại!",
+                            })
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#partial-stop-sell-btn').on('click',function(e) {
+            let r = confirm("Ngừng bán sản phẩm này?");
+            if (r == true){
+                var productId = $('#product-meta').attr('dataId');
+                $.ajax({
+                    url: "{% url 'products:product-update' %}" + productId,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function(result) {
+                        if (result["status"] == "success") {
+                            $('#p-detail-update').empty();
+                            $('#p-detail-update').attr('hidden', true);
+                            successNotification({
+                                message: "Thay đổi thành công",
+                            })
+                            datatable.draw();
+                        } else {
+                            errorNotification({
+                                title: "Thất bại!",
+                            })
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#partial-delete-btn').on('click',function(e) {
+
+            let r = confirm("Bạn chắc chắn xoá?");
+            if (r == true){
+                var productId = $('#product-meta').attr('dataId');
+                $.ajax({
+                    url: "{% url 'products:product-update' %}" + productId,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function(result) {
+                        if (result["status"] == "success") {
+                            $('#p-detail-update').empty();
+                            $('#p-detail-update').attr('hidden', true);
+                            successNotification({
+                                message: "Thay đổi thành công",
+                            })
+                            datatable.draw();
+                        } else {
+                            errorNotification({
+                                title: "Thất bại!",
+                            })
+                        }
+                    }
+                });
+            }
+
+        });
+
+        $('.fa-chevron-up').on('click', function(e) {
+            $(e.target).toggleClass('rotate-90');
+            let parent = $(e.target).parent().parent();
+            parent.toggleClass('sub-box-collapse');
+        });
+
+        $('.form-check').on('click', function(e) {
+            $('input[name="product-status"]').attr('checked', false);
+            $(this).find("input[name='product-status']").attr('checked', true);
+            datatable.draw();
+        });
+
+        // $('input[name="product-status"]').on('change', function(e) {
+        //     console.log(e.type);
+        // });
+    });
+</script>
+{% endblock %}

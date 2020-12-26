@@ -1,0 +1,16 @@
+{% load humanize %}
+{% load mathfilters %}
+
+<div class="product-item d-flex align-items-center px-2">
+    <span class="px-2">{{index}}</span>
+    <span class="remove-item ml-3 mr-4"><i class="fas fa-trash ml-1 hand"></i></span>
+    <div class="product-item-data row w-100">
+        <div class="product-code col-2" data-toggle="tooltip" title="Mã sản phẩm: {{product.product_code}}">{{product.product_code}}</div>
+        <div class="product-name col-6" data-toggle="tooltip" title="Tên sản phẩm: {{product.product_name}}">{{product.product_name}}</div>
+        <div class="col-1">
+            <input class="product-quantity text-center w-100" name="quantity[]" type="number" min="0" max="{{product.available}}" value="{{quantity}}" title="Số lượng sản phẩm: {{product.get_available}}" data-toggle="tooltip">
+        </div>
+        <div class="product-price col-1 text-center" data-toggle="tooltip" title="Giá sản phẩm: {{product.sell_price|intcomma}}">{{product.sell_price|intcomma}}</div>
+        <div class="subtotal col-2 text-center">{{product.sell_price|mul:quantity}}</div>
+    </div>
+</div>

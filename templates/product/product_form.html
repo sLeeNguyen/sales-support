@@ -1,0 +1,46 @@
+{% load widget_tweaks %}
+<form id="product-form" method="post" action="{{ form_url }}"
+      enctype="multipart/form-data" class="mt-3 mb-3" novalidate>
+    {% csrf_token %}
+    {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field }}
+        {% endfor %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-6">
+            {% include 'product/input.html' with field=form.product_code %}
+            {% include 'product/input.html' with field=form.barcode %}
+            {% include 'product/input.html' with field=form.product_name %}
+            {% include 'product/input.html' with field=form.category %}
+            {% include 'product/input.html' with field=form.description %}
+        </div>
+        <div class="col-md-6">
+            {% include 'product/input.html' with field=form.cost_price %}
+            {% include 'product/input.html' with field=form.sell_price %}
+            {% include 'product/input.html' with field=form.unit %}
+            {% include 'product/input.html' with field=form.available %}
+            {% include 'product/input.html' with field=form.mfg %}
+            {% include 'product/input.html' with field=form.exp %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        {% include 'product/input_image.html' with field=form.image1 extra_class="mr-3" %}
+        {% include 'product/input_image.html' with field=form.image2 extra_class="mr-3" %}
+        {% include 'product/input_image.html' with field=form.image3 extra_class="mr-3" %}
+        {% include 'product/input_image.html' with field=form.image4 extra_class="mr-3" %}
+        {% include 'product/input_image.html' with field=form.image5 %}
+    </div>
+    <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-success mr-3 mw-110"><i class="fas fa-save mr-3"></i>Lưu</button>
+        {% if action == 'add' %}
+        <button class="btn btn-secondary mw-110"><i class="fas fa-save mr-3"></i>Làm mới</button>
+        {% endif %}
+    </div>
+</form>

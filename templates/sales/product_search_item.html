@@ -1,0 +1,21 @@
+{% load humanize %}
+
+{% for product in data %}
+<div class="search-result-item d-flex mb-2" onclick="addProductItem(this)">
+    <input type="number" value="{{product.id}}" readonly hidden>
+    <div class="product-avt p-2">
+        <img src="{{ product.get_thumbnail }}" alt="ảnh">
+    </div>
+    <div class="product-meta p-2">
+        <div class="product-name mb-2">{{ product.product_name }}</div>
+        <div>
+            <span class="product-code pr-2">{{ product.product_code }}</span>
+            <span>Giá:<span class="product-price px-2">{{ product.sell_price }}</span></span>
+        </div>
+        <div>
+            <span>Tồn kho:<span class="product-available px-2">{{ product.get_available|intcomma }}</span></span>
+            <span>Đặt hàng:<span class="product-order-quantity px-2">0</span></span>
+        </div>
+    </div>
+</div>
+{% endfor %}

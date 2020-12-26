@@ -129,3 +129,12 @@ dmypy.json
 .pyre/
 
 # other
+/stores
+/static/resource/images/
+/business/migrations/00*
+/core/migrations/00*
+/coupons/migrations/00*
+/customers/migrations/00*
+/products/migrations/00*
+/sales/migrations/00*
+/users/migrations/00*

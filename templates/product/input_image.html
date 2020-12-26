@@ -1,0 +1,13 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<label class="custom-file-upload {{extra_class}}" >
+    <input type="file" name="{{field.name}}" accept="image/*" class="images-inp-upload"
+           onchange="readURL(this)" id="{{field.auto_id}}">
+    {% if field.value %}
+    <img src="{{field.value.url}}" alt="no image">
+    {% else %}
+    <img src="{% static 'resource/images/default_product.jpg'%}" alt="no image">
+    {% endif %}
+    <div class="img-upload-title">{{ field.label }}</div>
+</label>
