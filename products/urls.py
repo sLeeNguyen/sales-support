@@ -10,4 +10,6 @@ urlpatterns = [
     re_path(r'^product/update/((?P<pk>\d+)/?)?$', views.ProductUpdateView.as_view(),
             name='product-update'),
     re_path(r'^delete/((?P<pk>\d+)/?)?$', views.ProductDeleteView.as_view(), name='product-delete'),
+    re_path(r'^category/create/$', views.CategoryCreationView.as_view(), name='category-creation'),
+    re_path(r'^category/update/((?P<pk>\d+)/?)?$', views.CategoryDetailUpdateView.as_view(), name='category-update'),
 ]

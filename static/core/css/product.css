@@ -72,7 +72,7 @@ table.dataTable thead th.selected-all.select-checkbox:after {
 }
 
 .box-function .sub-box-function {
-    background-color: #eae9e9;
+    background-color: #ffffff;
     border-radius: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,.1);
 }
@@ -95,15 +95,15 @@ table.dataTable thead th.selected-all.select-checkbox:after {
     font-weight: bold;
 }
 
-.collapse-ic {
+.sub-box-function .box-title i.fas {
+    border-radius: 50%;
     cursor: pointer;
     padding: 4px;
-    border-radius: 50%;
     color: #212529;
     transition: 0.3s;
 }
 
-.collapse-ic:hover {
+.sub-box-function .box-title i.fas:hover {
     background-color: #cacaca;
 }
 
@@ -115,6 +115,30 @@ table.dataTable thead th.selected-all.select-checkbox:after {
 i.fas.fa-info-circle {
     color: #9c9b9a;
     cursor: pointer;
+}
+
+.category-option .selected {
+    font-weight: bold;
+}
+
+.category-option {
+    margin-left: -10px;
+    padding: 5px 0px 5px 10px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.category-option:hover {
+    background-color: #ececec;
+    border-radius: 3px;
+}
+
+.category-option .fa-edit {
+    visibility: hidden;
+}
+
+.category-option:hover .fa-edit {
+    visibility: initial;
 }
 
 .form-title {
@@ -172,7 +196,7 @@ span.product-name {
     font-size: 1.3em;
 }
 
-.product-detail-update {
+.overlay {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -210,8 +234,12 @@ span.product-name {
     display: flex;
 }
 
-.box-product-detail {
+.box-product-detail, .box-category {
     box-shadow: 0 5px 15px rgba(0,0,0,.1);
+}
+
+.box-category {
+    min-width: 460px;
 }
 
 .bg-white {

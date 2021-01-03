@@ -56,6 +56,32 @@ function productFormSetUp() {
     });
 }
 
+function categoryFormSetUp() {
+    $("#category-form").validate({
+        rules: {
+            category_name: {
+                required: true,
+            }
+        },
+        messages: {
+            category_name: {
+                required: "Cần nhập tên nhóm",
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group .col-md-8').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+}
+
 function readURL(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -78,26 +104,19 @@ function formCallAjax(formId, url, successCallBack, failCallBack) {
 
         var formData = new FormData(form[0]);
         var url = form.attr('action');
+
         $.ajax({
             type: 'POST',
             url: url,
-            // headers: {'X-CSRFToken': '{{ csrf_token }}'},
             enctype: 'multipart/form-data',
             data: formData,
             processData: false,
             contentType: false,
             success: function(data) {
                 if (data['status'] == "success") {
-                    successCallBack()
-                    successNotification({
-                        title: "Thành công",
-                        message: "Cập nhật thành công",
-                    })
+                    successCallBack();
                 } else {
-                    errorNotification({
-                        title: "Lỗi",
-                        message: data.data[0],
-                    })
+                    failCallBack(data);
                 }
             }
         })

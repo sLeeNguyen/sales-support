@@ -1,16 +1,29 @@
 {% load humanize %}
 {% load mathfilters %}
 
-<div class="product-item d-flex align-items-center px-2">
+<div id="{{product.id}}" class="product-item d-flex align-items-center px-2">
     <span class="px-2">{{index}}</span>
-    <span class="remove-item ml-3 mr-4"><i class="fas fa-trash ml-1 hand"></i></span>
+    <span class="remove-item ml-3 mr-4" title="Xoá sản phẩm" data-toggle="tooltip" data-placement="bottom">
+        <i class="fas fa-trash ml-1 hand" onclick="removeProductItem(this)" pid={{product.id}}></i>
+    </span>
     <div class="product-item-data row w-100">
-        <div class="product-code col-2" data-toggle="tooltip" title="Mã sản phẩm: {{product.product_code}}">{{product.product_code}}</div>
-        <div class="product-name col-6" data-toggle="tooltip" title="Tên sản phẩm: {{product.product_name}}">{{product.product_name}}</div>
+        <div class="col-2"><span class="product-code" data-toggle="tooltip" data-placement="bottom" title="Mã sản phẩm: {{product.product_code}}">{{product.product_code}}</span></div>
+        <div class="col-5"><span class="product-name" data-toggle="tooltip" data-placement="bottom" title="Tên sản phẩm: {{product.product_name}}">{{product.product_name}}</span></div>
         <div class="col-1">
-            <input class="product-quantity text-center w-100" name="quantity[]" type="number" min="0" max="{{product.available}}" value="{{quantity}}" title="Số lượng sản phẩm: {{product.get_available}}" data-toggle="tooltip">
+            <input class="product-quantity text-center w-100" name="quantity[]" type="number" min="0" max="{{product.available}}"
+                   value="{{quantity}}" title="Số lượng sản phẩm mua" data-toggle="tooltip" data-placement="bottom"
+                   onchange="changeProductQuantity(this)" pid={{product.id}}>
         </div>
-        <div class="product-price col-1 text-center" data-toggle="tooltip" title="Giá sản phẩm: {{product.sell_price|intcomma}}">{{product.sell_price|intcomma}}</div>
-        <div class="subtotal col-2 text-center">{{product.sell_price|mul:quantity}}</div>
+        <div class="col-1">
+            {% if product.available < quantity %}
+            <i class="available fas fa-exclamation-triangle invalid" style="color: red;" data-toggle="tooltip" data-placement="bottom"
+               title="Tồn kho: {{product.available}} {{product.unit}}"></i>
+            {% else %}
+            <i class="available fas fa-exclamation-triangle" style="color: red;" data-toggle="tooltip" data-placement="bottom"
+               title="Tồn kho: {{product.available}} {{product.unit}}"></i>
+            {% endif %}
+        </div>
+        <div class="product-price col-1 text-center" data-toggle="tooltip" data-placement="bottom" title="Giá sản phẩm: {{product.sell_price|intcomma}}">{{product.sell_price|intcomma}}</div>
+        <div class="subtotal col-2 text-center">{{product.sell_price|mul:quantity|intcomma}}</div>
     </div>
 </div>

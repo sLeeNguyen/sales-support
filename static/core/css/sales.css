@@ -18,6 +18,11 @@ html, body {
     cursor: pointer;
 }
 
+.line {
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,.1);
+}
+
 .bg-hover {
     padding: 8px 10px;
 }
@@ -27,9 +32,13 @@ html, body {
     border-radius: 3px;
 }
 
+.txt-bold {
+    font-weight: bold;
+}
+
 .header {
     background-color: var(--main-bg-color);
-    height: 50px;
+    height: 45px;
     padding: 0px 20px;
     display: flex;
 }
@@ -85,11 +94,11 @@ html, body {
     font-size: 0.8rem;
 }
 
-.header .tab-invoices {
+.header .tab-invoices .list-tab {
     overflow: hidden;
 }
 
-.header-search .search-bar input {
+.input-border-bottom {
     border-radius: 3px;
     border: 1px cornsilk solid;
     width: 100%;
@@ -99,6 +108,91 @@ html, body {
     font-size: var(--main-font-size);
 }
 
+.sell-right .input-border-bottom {
+    border-color: black;
+    border-width: 0px 0px 1px 0px;
+    border-radius: 0px;
+    font-size: var(--main-font-size);
+    padding: 5px 25px;
+}
+
+.sell-right .input-border-bottom:focus {
+    border-bottom: 2px solid var(--main-bg-color);
+    padding-bottom: 4px;
+}
+
+.sell-right .search-bar i {
+    font-size: 0.9rem;
+}
+
+.sell-right .invoice-title {
+    background-color: var(--main-bg-color);
+    color: white;
+    font-size: var(--main-font-size);
+}
+
+.payment {
+    font-size: 0.85rem;
+    padding: 10px 0;
+}
+
+.fr {
+    display: flex;
+    justify-content: flex-end;
+    font-size: var(--main-font-size);
+}
+
+.payment-money .label span {
+    color: #029814;
+    font-size: 1.1rem;
+}
+
+.label #refund {
+    font-size: 1.1rem;
+}
+
+.sell-right .label .input-border-bottom {
+    font-size: 1.1rem;
+}
+
+.payment .input-border-bottom {
+    padding: 0 0 1px;
+    text-align: end;
+    -moz-appearance: textfield;
+    border-color: #cacaca;
+}
+
+.payment .input-border-bottom:focus {
+    border-bottom: 2px solid var(--main-bg-color);
+    padding-bottom: 0;
+}
+
+.payment input::-webkit-outer-spin-button,
+.payment input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.note .input-border-bottom {
+    border-color: #cacaca;
+}
+
+.note {
+    position: relative;
+}
+
+.note i {
+    position: absolute;
+    top: 8px;
+    color: #a7a7a7;
+}
+
+.submit button {
+    width: 100%;
+    height: 50px;
+    font-weight: bold;
+}
+
 .tab-invoices .list-tab {
     list-style: none;
     display: flex;
@@ -106,14 +200,16 @@ html, body {
 }
 
 .tab-invoices .list-tab i {
-    font-size: 13px;
-    color: #a1a7ad;
-    visibility: hidden;
+    font-size: 14px;
+    color: white;
 }
 
-.tab-invoices .list-tab li:hover i {
-    visibility: inherit;
-    transition: 0.3s all;
+.tab-invoices .list-tab .selected i {
+    color: #a1a7ad;
+}
+
+#add-order i {
+    color: white;
 }
 
 .header-right {
@@ -162,6 +258,14 @@ html, body {
     outline: none;
 }
 
+i.available.fas.fa-exclamation-triangle {
+    display: none;
+}
+
+i.available.fas.fa-exclamation-triangle.invalid {
+    display: initial !important;
+}
+
 /*@media screen and (min-width: )*/
 
 @media screen and (min-width: 998px) {
@@ -182,14 +286,19 @@ html, body {
 
     .tab-invoices .list-tab .invoice {
         min-width: 100px;
-        background-color: white;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 8px;
-        border-radius: 2px;
+        margin-right: 3px;
         font-size: var(--main-font-size);
+        color: white;
+        background-color: #01010112;
+    }
+
+    .invoice.selected {
+        background-color: white !important;
+        color: #212529 !important;
     }
 
     .sell-main {
@@ -202,8 +311,9 @@ html, body {
     }
 
     .sell-main .sell-right {
-        min-width: 300px;
-        background-color: #000;
+        min-width: 350px;
+        max-width: 350px;
         height: 100%;
+        padding: 10px;
     }
 }

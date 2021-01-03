@@ -7,7 +7,7 @@ from django.db.models import Q
 fields = ['product_code', 'product_name', 'sell_price', 'cost_price', 'available']
 
 
-class ProductServices:
+class ProductManagement:
 
     @classmethod
     def get_products_datatables(cls, post):
@@ -20,8 +20,13 @@ class ProductServices:
         order_type = post['order[0][dir]']
         search_val = post['search[value]']
         product_status = int(post.get('productStatus', 1))
+        category_id = int(post.get('categoryId'))
 
         results = Product.objects.filter(status=product_status)
+
+        if category_id != 0:
+            category = Category.objects.get(pk=category_id)
+            results = results.filter(category=category)
         if search_val:
             results = results.filter(
                 Q(product_code__icontains=search_val) | Q(product_name__icontains=search_val)

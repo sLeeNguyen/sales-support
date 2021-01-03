@@ -1,4 +1,4 @@
-<div id="cart" class="cart w-100">
+<div id="cart" class="cart w-100" cartdata={{oid}}>
     {% for pitem in list_items %}
         {% include 'sales/product_item.html' with product=pitem.product quantity=pitem.quantity index=forloop.counter %}
     {% endfor %}

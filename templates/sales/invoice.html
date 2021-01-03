@@ -1,0 +1,200 @@
+{% load static %}
+{% load humanize %}
+{% load mathfilters %}
+{% load custom_tags %}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cửa hàng Mini Smart</title>
+
+    <style>
+    .invoice-box {
+        max-width: 800px;
+        margin: auto;
+        font-size: 16px;
+        line-height: 24px;
+        font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        color: #000;
+    }
+
+    .invoice-box table {
+        width: 100%;
+        line-height: inherit;
+        text-align: left;
+    }
+
+    .invoice-box table td {
+        padding: 5px;
+        vertical-align: top;
+    }
+
+    .invoice-box table tr td:nth-child(3) {
+        text-align: right;
+    }
+
+    .invoice-box table tr.top table td {
+        padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.top table td.title {
+        font-size: 20px;
+        color: #000;
+        display: flex;
+        align-items: center;
+    }
+
+    .invoice-box table tr.information table td {
+        padding-bottom: 40px;
+    }
+
+    .invoice-box table tr.heading td {
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+        min-width: 100px;
+    }
+
+    .invoice-box table tr.details td {
+        padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.item td{
+        border-bottom: 1px solid #eee;
+    }
+
+    .invoice-box table tr.item.last td {
+        border-bottom: none;
+    }
+
+    .invoice-box table tr.total td:nth-child(1) {
+        font-weight: bold;
+        text-align: right;
+        padding-right: 30px;
+    }
+
+    .invoice-box table tr.total td:nth-child(2) {
+        text-align: right;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .invoice-box table tr.top table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+
+        .invoice-box table tr.information table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+    }
+
+    /** RTL **/
+    .rtl {
+        direction: rtl;
+        font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+    }
+
+    .rtl table {
+        text-align: right;
+    }
+
+    .rtl table tr td:nth-child(2) {
+        text-align: left;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-box">
+        <table cellpadding="0" cellspacing="0">
+            <tr class="top">
+                <td colspan="3">
+                    <table>
+                        <tr>
+                            <td class="title">
+                                <img src="{% static 'core/images/vietnam.svg' %}" style="max-width:40px;">
+                                <span style="margin-left: 10px;font-weight: bold;">Mini Smart</span>
+                            </td>
+
+                            <td style="text-align: right;">
+                                <b>Mã hoá đơn: {{ invoice.invoice_code }}</b><br>
+                                Ngày {{ invoice.time_create.day }} tháng {{ invoice.time_create.month }}
+                                năm {{ invoice.time_create.year }}<br>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="information">
+                <td colspan="3">
+                    <table>
+                        <tr>
+                            <td>
+                                Khách hàng: Khách lẻ<br>
+                                SĐT: <br>
+                                Địa chỉ: --
+                            </td>
+
+                            <td style="text-align: right;">
+                                Cửa hàng: <b>Acme Corp</b><br>
+                                SĐT: 0868686868<br>
+                                15 Hồ Tùng Mậu
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="heading">
+                <td>
+                    Mặt hàng
+                </td>
+
+                <td>
+                    Số lượng
+                </td>
+
+                <td>
+                    Thành tiền
+                </td>
+            </tr>
+            {% for pitem in list_product_items %}
+            <tr class="item">
+                <td>
+                    {{ pitem.product.product_name }}<br>
+                    <span style="font-size: 13px; color:#292929;">Đơn giá: {{ pitem.product.sell_price|intcomma }}</span>
+                </td>
+                <td>{{ pitem.quantity|intcomma }}</td>
+                <td>{{ pitem.product.sell_price|mul:pitem.quantity|to_int|intcomma }}</td>
+            </tr>
+            {% endfor %}
+<!--            <tr class="item">-->
+<!--                <td>-->
+<!--                    Website design<br>-->
+<!--                    <span style="font-size: 13px; color:#292929;">Đơn giá: 10,000</span>-->
+<!--                </td>-->
+<!--                <td>2</td>-->
+<!--                <td>20,000</td>-->
+<!--            </tr>-->
+            <tr class="total">
+                <td colspan="2">Tổng tiền hàng:</td>
+                <td>{{ invoice.total|intcomma }}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="2">Chiết khấu:</td>
+                <td>{{ invoice.discount|intcomma }}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="2">Tổng thanh toán:</td>
+                <td>{{ invoice.total|sub:invoice.discount|intcomma }}</td>
+            </tr>
+        </table>
+        <div style="text-align: center; margin-top: 20px;"><i>Xin chân trọng cảm ơn quý khách!</i></div>
+    </div>
+</body>
+</html>

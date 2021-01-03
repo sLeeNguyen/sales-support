@@ -4,21 +4,22 @@ from django.http import JsonResponse
 from django.shortcuts import (
     render, HttpResponse, HttpResponseRedirect, reverse, get_object_or_404
 )
+from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
 from core.views import LoginRequire
-from products.models import Product
-from products.services import ProductServices
-from products.forms import ProductForm
+from products.models import Product, Category
+from products.services import ProductManagement
+from products.forms import ProductForm, CategoryForm
 
 
 class ProductListView(LoginRequire, View):
-    active = 'products'
 
     def get(self, request):
         table_columns = ['', 'Mã sản phẩm', 'Tên sản phẩm', 'Giá bán', 'Giá vốn', 'Tồn kho']
-        context = {'table_columns': table_columns, 'active': self.active}
+        categories = Category.objects.all()
+        context = {'table_columns': table_columns, 'list_categories': categories}
         return render(request, template_name='product/products.html', context=context)
 
     def post(self, request):
@@ -26,7 +27,7 @@ class ProductListView(LoginRequire, View):
         Handle operations sorting, paging, getting of datatables.
         Return json response to datatables
         """
-        response = ProductServices.get_products_datatables(request.POST)
+        response = ProductManagement.get_products_datatables(request.POST)
 
         return HttpResponse(json.dumps(response))
 
@@ -41,7 +42,6 @@ class ProductCreationView(LoginRequire, CreateView):
         context = {
             'form': form,
             'action': 'add',
-            'form_method': 'post',
             'url': reverse('products:product-creation')
         }
         return render(request, self.template_name, context=context)
@@ -54,7 +54,6 @@ class ProductCreationView(LoginRequire, CreateView):
 
         context = {
             'form': form,
-            'active': self.active,
             'url': reverse('products:product-creation')
         }
         return render(request, self.template_name, context=context)
@@ -162,7 +161,7 @@ class ProductUpdateView(LoginRequire, View):
         return JsonResponse({'status': 'success'})
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequire, DeleteView):
     model = Product
     queryset = Product.objects.all()
     lookup_field = 'pk'
@@ -181,3 +180,63 @@ class ProductDeleteView(DeleteView):
             if delete_objs and len(delete_objs) > 0:
                 delete_objs.delete()
         return JsonResponse({'status': 'success'})
+
+
+class CategoryCreationView(LoginRequire, View):
+    model = Category
+    form_class = CategoryForm
+    template_name = "category/add_category.html"
+
+    def get(self, request):
+        form = self.form_class()
+        context = {
+            "form": form,
+        }
+        return render(request, template_name=self.template_name, context=context)
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            response = {
+                "status": "success"
+            }
+            return JsonResponse(data=response, status=200)
+        errors = []
+        for field in form:
+            for error in field.errors:
+                errors.append({'id': field.auto_id, 'error': error})
+        response = {
+            "status": "failed",
+            "data": errors
+        }
+        return JsonResponse(data=response, status=200)
+
+
+class CategoryDetailUpdateView(LoginRequire, View):
+    model = Category
+    form_class = CategoryForm
+
+    def get(self, request, pk):
+        category = get_object_or_404(self.model, pk=pk)
+        form = self.form_class(instance=category)
+        context = {
+            "form": form,
+            "id": category.id,
+        }
+        return render(request, template_name="category/update_category.html", context=context)
+
+    def post(self, request, pk):
+        category = get_object_or_404(self.model, pk=pk)
+        form = self.form_class(request.POST, instance=category)
+        response = {'status': 'success'}
+        if form.is_valid():
+            form.save()
+        else:
+            response['status'] = "failed"
+            errors = []
+            for field in form:
+                for error in field.errors:
+                    errors.append({'id': field.auto_id, 'error': error})
+            response['data'] = errors
+        return JsonResponse(data=response, status=200)
