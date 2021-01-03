@@ -18,7 +18,7 @@
     <div class="sub-box-function pl-3 pr-3 pt-2 pb-3">
         <div class="box-title d-flex mb-3">
             <div class="title">Trạng thái hàng</div>
-            <i class="fas fa-chevron-up collapse-ic"></i>
+            <div><i class="fas fa-chevron-up collapse-ic"></i></div>
         </div>
         <div class="option pl-2 pr-2">
             <div class="form-check mb-2">
@@ -33,6 +33,30 @@
                     Ngừng bán
                 </label>
             </div>
+        </div>
+    </div>
+    <div class="sub-box-function pl-3 pr-3 pt-2 pb-3 mt-3">
+        <div class="box-title d-flex mb-3">
+            <div class="title">Nhóm hàng</div>
+            <div>
+                <i class="fas fa-plus mr-1" title="Thêm mới" data-toggle="tooltip" data-placement="top"
+                   onclick="addCategory();"></i>
+                <i class="fas fa-chevron-up collapse-ic"></i>
+            </div>
+        </div>
+
+        <div class="option pl-2 pr-2">
+            <div class="d-flex align-items-center justify-content-between category-option mb-1">
+                <div class="category-name w-100 selected" onclick="loadProductByCategory(this)" cid="0">Tất cả</div>
+            </div>
+            {% for category in list_categories %}
+            <div class="d-flex align-items-center justify-content-between category-option mb-1">
+                <div class="category-name w-100" onclick="loadProductByCategory(this)" cid="{{ category.id }}">
+                    {{ category.category_name }}</div>
+                <i class="fas fa-edit mr-2" title="Chỉnh sủa" data-toggle="tooltip" data-placement="right"
+                   cid="{{ category.id }}" onclick="showCategory(this)"></i>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -76,13 +100,15 @@
 <!--    <h6 class="p-2">Thao tác</h6>-->
     <div class="sub-box-function d-flex justify-content-center mr-3 ml-3 pt-3 pb-3">
         <div class="operation-box ml-3">
-            <button id="no-sell-btn" type="button" class="btn btn-danger px-3" title="Ngừng bán các sản phẩm đã chọn.">
+            <button id="no-sell-btn" type="button" class="btn btn-danger px-3" title="Ngừng bán các sản phẩm đã chọn."
+                    data-toggle="tooltip" data-placement="bottom">
                 <i class="fas fa-ban mr-2"></i>
                 Ngừng bán
             </button>
         </div>
         <div class="operation-box ml-3">
-            <button id="delete-btn" type="button" class="btn btn-danger px-3 ml-3" title="Xoá các sản phẩm đã chọn.">
+            <button id="delete-btn" type="button" class="btn btn-danger px-3 ml-3" title="Xoá các sản phẩm đã chọn."
+                    data-toggle="tooltip" data-placement="bottom">
                 <i class="fas fa-trash-alt mr-2"></i>
                 Xoá
             </button>
@@ -92,19 +118,39 @@
 {% endblock %}
 
 {% block expand %}
-<div id="p-detail-update" class="product-detail-update" hidden></div>
+<div id="p-detail-update" class="overlay"></div>
 {% endblock %}
 
 {% block manage_js %}
 <script src="{% static 'core/vendor/dataTables/js/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'core/vendor/dataTables/js/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'core/vendor/dataTables/js/dataTables.select.min.js' %}"></script>
-<script src="{% static 'core/vendor/jquery-ui/jquery-ui.min.js' %}"></script>
 <script src="{% static 'core/vendor/js-validate/jquery.validate.min.js' %}"></script>
 <script src="{% static 'core/js/product.js' %}"></script>
 <script type="text/javascript">
+    var datatable;
+
+    function show(html) {
+        $('#p-detail-update').empty();
+        $('#p-detail-update').append(html);
+        $('#p-detail-update').fadeIn();
+
+        $('#btn-close').on('click', function() {
+            $('#p-detail-update').fadeOut();
+            $('#p-detail-update').empty();
+        });
+    }
+
     $(document).ready(function() {
-        var datatable = $('#table_id').DataTable({
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $("body").click(function() {
+            $(".tooltip").remove();
+        });
+
+        $('#p-detail-update').fadeOut();
+
+        datatable = $('#table_id').DataTable({
             processing: true,
             serverSide: true,
             language: {
@@ -132,6 +178,7 @@
                 type: "POST",
                 data: function(d) {
                     d.productStatus = $('input[name="product-status"]:checked').val();
+                    d.categoryId = $('.category-option .selected').attr("cid");
                 },
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
             }
@@ -170,16 +217,7 @@
 
         // add event when table redraw
         datatable.on('draw', function() {
-            function show(html) {
-                $('#p-detail-update').empty();
-                $('#p-detail-update').append(html);
-                $('#p-detail-update').attr('hidden', false);
 
-                $('#btn-close').on('click', function() {
-                    $('#p-detail-update').empty();
-                    $('#p-detail-update').attr('hidden', true);
-                });
-            }
             function changeImageShow(element) {
                 if ($('.img-thumb.active') != null) {
                     $('.img-thumb.active').toggleClass('active');
@@ -206,6 +244,19 @@
                             formCallAjax("#product-form", null, function() {
                                 $('#p-detail-update').empty();
                                 $('#p-detail-update').attr('hidden', true);
+                                successNotification({
+                                    title: "Thành công",
+                                    message: "Cập nhật thành công",
+                                });
+                                datatable.draw();
+                            }, function(data) {
+                                data.data.forEach(item => {
+                                    $(`#${item.id}`).addClass("is-invalid");
+                                    errorNotification({
+                                        title: "Lỗi!",
+                                        message: item.error,
+                                    })
+                                });
                             });
                         },
                         error: function(err) {
@@ -289,7 +340,7 @@
         });
 
         $('#delete-btn').on('click', function(e) {
-            var list_ids = $(".selected").map((index, ele) => {
+            var list_ids = $("#table_id .selected").map((index, ele) => {
                 return $(ele).attr('id');
             });
             console.log(list_ids.toArray());
@@ -331,10 +382,9 @@
         });
 
         $('#no-sell-btn').on('click', function(e) {
-            var list_ids = $(".selected").map((index, ele) => {
+            var list_ids = $("#table_id .selected").map((index, ele) => {
                 return $(ele).attr('id');
             });
-            console.log(list_ids.toArray());
 
             if (list_ids.length == 0) {
                 warningNotification({
@@ -431,7 +481,7 @@
 
         $('.fa-chevron-up').on('click', function(e) {
             $(e.target).toggleClass('rotate-90');
-            let parent = $(e.target).parent().parent();
+            let parent = $(e.target).parent().parent().parent();
             parent.toggleClass('sub-box-collapse');
         });
 
@@ -440,10 +490,70 @@
             $(this).find("input[name='product-status']").attr('checked', true);
             datatable.draw();
         });
-
-        // $('input[name="product-status"]').on('change', function(e) {
-        //     console.log(e.type);
-        // });
     });
+</script>
+<script type="text/javascript">
+    function loadProductByCategory(ele) {
+        $(".category-option .selected").toggleClass("selected");
+        $(ele).addClass("selected");
+        datatable.draw();
+    }
+
+    function showCategory(ele) {
+        const cid = $(ele).attr("cid");
+        $.ajax({
+            url: `/products/category/update/${cid}/`,
+            method: "GET",
+            success: function(data) {
+                show(data);
+                categoryFormSetUp();
+                formCallAjax("#category-form", "",
+                function() {
+                    successNotification({
+                        title: "Thành công",
+                        message: "Cập nhật thành công",
+                    });
+                },
+                function(data) {
+                    data.data.forEach(item => {
+                        $(`#${item.id}`).addClass("is-invalid");
+                        errorNotification({
+                            title: "Lỗi!",
+                            message: item.error,
+                        })
+                    });
+                });
+            }
+        })
+    }
+
+    function addCategory() {
+        const url = "{% url 'products:category-creation' %}";
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function(data) {
+                show(data);
+                categoryFormSetUp();
+                formCallAjax("#category-form", url,
+                function() {
+                    $('.removeLater').val("");
+                    successNotification({
+                        title: "Thành công",
+                        message: "Đã thêm nhóm hàng mới",
+                    });
+                },
+                function(data) {
+                    data.data.forEach(item => {
+                        $(`#${item.id}`).addClass("is-invalid");
+                        errorNotification({
+                            title: "Lỗi!",
+                            message: item.error,
+                        })
+                    });
+                });
+            }
+        })
+    }
 </script>
 {% endblock %}

@@ -2,7 +2,31 @@ from django import forms
 from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from products.models import Product
+from products.models import Product, Category
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["category_name", "description"]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+        }
+
+    def clean_category_name(self):
+        category_name = self.cleaned_data["category_name"].strip()
+        while category_name.find("  ") != -1:
+            category_name = category_name.replace("  ", " ")
+        if category_name == "":
+            raise ValidationError(
+                _("Tên nhóm phải chứa ít nhát một chữ cái.")
+            )
+        if not self.instance.pk:
+            if Category.objects.filter(category_name=category_name).exists():
+                raise ValidationError(
+                    _("Nhóm hàng đã tồn tại")
+                )
+        return category_name
 
 
 class ProductForm(forms.ModelForm):

@@ -3,10 +3,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
-class CategoryManager(models.Manager):
-    pass
-
-
 class ProductManager(models.Manager):
     prefix = 'SP'
 
@@ -25,11 +21,11 @@ class ProductManager(models.Manager):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=255, unique=True, blank=False, null=False)
-    description = models.TextField(default='', blank=True)
+    category_name = models.CharField(_("Tên nhóm"), max_length=255, unique=True, blank=False, null=False)
+    description = models.TextField(_("Mô tả"), default='', blank=True)
 
     def __str__(self):
-        return self.category_name.strip()
+        return self.category_name
 
 
 class Product(models.Model):
@@ -106,4 +102,5 @@ class Product(models.Model):
             'product_name': self.product_name,
             'sell_price': self.sell_price,
             'available': self.get_available(),
+            'unit': self.get_unit_display()
         }
