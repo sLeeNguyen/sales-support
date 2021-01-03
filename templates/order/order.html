@@ -1,0 +1,242 @@
+{% extends "core/manage_base.html" %}
+{% load static %}
+
+{% block title %}
+<title>Products Management</title>
+{% endblock %}
+
+{% block manage_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'core/vendor/dataTables/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'core/vendor/dataTables/css/select.dataTables.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'core/css/product.css' %}">
+{% include 'core/notification_css_js.html' %}
+{% endblock %}
+
+{% block manage_left %}
+<div class="box-function">
+    <h6 class="p-2">Hoá Đơn</h6>
+    <div class="sub-box-function pl-3 pr-3 pt-2 pb-3">
+        <div class="box-title d-flex mb-3">
+            <div class="title">Trạng thái</div>
+            <div><i class="fas fa-chevron-up collapse-ic"></i></div>
+        </div>
+        <div class="option pl-2 pr-2">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="status" id="1" value="1" checked="checked">
+                <label class="form-check-label" for="1">
+                    Hoàn thành
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="status" id="2" value="0">
+                <label class="form-check-label" for="2">
+                    Đã huỷ
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="sub-box-function pl-3 pr-3 pt-2 pb-3 mt-3">
+        <div class="box-title d-flex mb-3">
+            <div class="title">Thời gian</div>
+            <div>
+                <i class="fas fa-chevron-up collapse-ic"></i>
+            </div>
+        </div>
+
+        <div class="option pl-2 pr-2">
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block manage_right %}
+
+<table id="table_id" class="table table-hover" style="width:100%">
+    <thead class="table-head">
+        <tr>
+            {% for column_name in table_columns %}
+            <th>{{ column_name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+</table>
+<div class="box-function my-3">
+<!--    <h6 class="p-2">Thao tác</h6>-->
+    <div class="sub-box-function d-flex justify-content-center mr-3 ml-3 pt-3 pb-3">
+        <div class="operation-box ml-3">
+            <button type="button" class="btn btn-danger px-3 ml-3" title="Huỷ các hoá đơn đã chọn."
+                    data-toggle="tooltip" data-placement="bottom">
+                <i class="fas fa-times mr-2"></i>
+                Huỷ bỏ
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block expand %}
+<div id="p-detail-update" class="overlay"></div>
+{% endblock %}
+
+{% block manage_js %}
+<script src="{% static 'core/vendor/dataTables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'core/vendor/dataTables/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'core/vendor/dataTables/js/dataTables.select.min.js' %}"></script>
+<script src="{% static 'core/vendor/js-validate/jquery.validate.min.js' %}"></script>
+<script type="text/javascript">
+    var datatable;
+
+    function show(html) {
+        $('#p-detail-update').empty();
+        $('#p-detail-update').append(html);
+        $('#p-detail-update').fadeIn();
+
+        $('#btn-close').on('click', function() {
+            flushOverlay();
+        });
+    }
+
+    function flushOverlay() {
+        $('#p-detail-update').fadeOut();
+        $('#p-detail-update').empty();
+    }
+
+    $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $("body").click(function () {
+            $(".tooltip").remove();
+        });
+
+        $('#p-detail-update').fadeOut();
+
+        datatable = $('#table_id').DataTable({
+            processing: true,
+            serverSide: true,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.10.21/i18n/Vietnamese.json",
+            },
+            columnDefs: [
+                {
+                    orderable: false,
+                    searchable: false,
+                    className: "select-checkbox",
+                    targets: 0,
+                },
+                {
+                    className: "p-field-info",
+                    targets: [1, 2, 3, 4, 5],
+                }
+            ],
+            select: {
+                style:    'multi',
+                selector: 'td:first-child'
+            },
+            order: [[2, 'desc']],
+            ajax: {
+                url: "{% url 'sales:list-invoices' %}",
+                type: "POST",
+                data: function(d) {
+                    d.invoiceStatus = $('input[name="status"]:checked').val();
+                },
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            }
+        });
+
+        $('#table_id').on('init.dt', function () {
+            // Call datatables, and return the API to the variable for use in our code
+            // Binds datatables to all elements with a class of datatable
+            const dtable = $("#table_id").dataTable().api();
+
+            // Grab the datatables input box and alter how it is bound to events
+            $(".dataTables_filter input[type='search']")
+                .unbind() // Unbind previous default bindings
+                .bind("keyup", function(e) { // Bind our desired behavior
+                    // If the length is 3 or more characters, or the user pressed ENTER, search
+                    if(this.value.length >= 3 || e.keyCode == 13) {
+                        dtable.search(this.value).draw();
+                    }
+                    // Ensure we clear the search if they backspace far enough
+                    if(this.value == "") {
+                        dtable.search("").draw();
+                    }
+                    return;
+                });
+            $("th.select-checkbox").on("click", function(e) {
+                if (this.classList.contains("selected-all")) {
+                    dtable.rows().deselect();
+                } else {
+                    dtable.rows().select();
+                }
+                $(this).toggleClass('selected-all');
+            });
+        });
+
+        datatable.on('draw', function() {
+            $('#table_id tbody tr .p-field-info').on('click', function() {
+                let id = $(this).parent().attr('id');
+                $.ajax({
+                    url: `invoice/${id}/`,
+                    type: "GET",
+                    success: function(data) {
+                        show(data);
+                    }
+                });
+            });
+        });
+
+        $('.fa-chevron-up').on('click', function(e) {
+            $(e.target).toggleClass('rotate-90');
+            let parent = $(e.target).parent().parent().parent();
+            parent.toggleClass('sub-box-collapse');
+        });
+
+        $('.form-check').on('click', function(e) {
+            $('input[name="status"]').attr('checked', false);
+            $(this).find("input[name='status']").attr('checked', true);
+            datatable.draw();
+        });
+    });
+</script>
+<script type="text/javascript">
+    function removeInvoice(ele) {
+        const invoiceId = $(ele).attr("iid");
+        let r = confirm("Bạn chắc chắn muốn huỷ hoá đơn này?");
+
+        if (r == true) {
+            $.ajax({
+                url: `/invoices/invoice/${invoiceId}/`,
+                type: "PATCH",
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                data: {"status": 0},
+                success: function() {
+                    flushOverlay();
+                    successNotification({
+                        title: "Thành công",
+                        message: "Đã huỷ hoá đơn."
+                    });
+                    datatable.draw();
+                }
+            });
+        }
+    }
+
+    function restoreInvoice(ele) {
+        const invoiceId = $(ele).attr("iid");
+        $.ajax({
+            url: `/invoices/invoice/${invoiceId}/`,
+            type: "PATCH",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: {"status": 1},
+            success: function() {
+                flushOverlay();
+                successNotification({
+                    title: "Phục hồi thành công"
+                });
+                datatable.draw();
+            }
+        });
+    }
+</script>
+{% endblock %}

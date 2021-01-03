@@ -1,0 +1,126 @@
+{% load humanize %}
+{% load mathfilters %}
+
+<div class="container box-product-detail bg-white br-5 p-4 my-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="ml-3">
+            <span class="product-name">Thông tin hoá đơn</span>
+        </div>
+        <button id="btn-close" class="btn btn-outline-info"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="row" style="font-size: 0.9rem">
+        <div class="col-md-4">
+            <div class="form-group d-flex align-items-center bb-1 mb-4">
+                <label class="col-md-5 col-form-label pl-0">Mã hoá đơn:</label>
+                <div class="col-md-7 pl-0">
+                    <span><strong>{{ invoice.invoice_code }}</strong></span>
+                </div>
+            </div>
+            <div class="form-group d-flex align-items-center bb-1 mb-4">
+                <label class="col-md-5 col-form-label pl-0">Thời gian tạo:</label>
+                <div class="col-md-7 pl-0">
+                    <span>{{ invoice.get_time_create_format }}</span>
+                </div>
+            </div>
+            <div class="form-group d-flex align-items-center bb-1 mb-4">
+                <label class="col-md-5 col-form-label pl-0">Khách hàng:</label>
+                <div class="col-md-7 pl-0">
+                    <span>{{ invoice.order.get_customer }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group d-flex align-items-center bb-1 mb-4">
+                <label class="col-md-4 col-form-label pl-0">Trạng thái:</label>
+                <div class="col-md-8 pl-0">
+                    <span>{{ invoice.get_status_display }}</span>
+                </div>
+            </div>
+            <div class="form-group d-flex align-items-center bb-1 mb-4">
+                <label class="col-md-4 col-form-label pl-0">Người tạo:</label>
+                <div class="col-md-8 pl-0">
+                    <span>{{ invoice.get_staff_name }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex note pl-2 h-100 pt-2">
+                <i class="fas fa-pencil-alt mr-2 mt-1"></i>
+                {% if invoice.order.note %}
+                <p>{{ invoice.order.note }}</p>
+                {% else %}
+                <p>Không có ghi chú.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="invoice-detail mt-4 p-2">
+        <div class="table-responsive">
+            <table class="table table-sm">
+            <thead>
+            <tr class="table-primary">
+                <th scope="col">Mã hàng</th>
+                <th scope="col" class="w-100">Tên hàng</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Giá nhập</th>
+                <th scope="col">Giá bán</th>
+                <th scope="col" class="text-center">Thành tiền</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in invoice.order.get_list_product_items %}
+            <tr class="table-secondary">
+                <td><a href="#">{{ item.product.product_code }}</a></td>
+                <td>{{ item.product.product_name }}</td>
+                <td class="pl-3">{{ item.quantity|intcomma }}</td>
+                <td>{{ item.product.cost_price|intcomma }}</td>
+                <td>{{ item.product.sell_price|intcomma }}</td>
+                <td class="text-right pr-3">{{ item.get_sub_total|intcomma }}</td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+        </div>
+        <div class="d-flex justify-content-end">
+            <table class="table table-borderless table-sm" style="width: 250px;">
+                <tr>
+                    <td colspan="5" class="text-right">Tổng số lượng:</td>
+                    <td class="text-right pr-3"><b>{{ invoice.total_products|intcomma }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right">Tổng tiền hàng:</td>
+                    <td class="text-right pr-3"><b>{{ invoice.total|intcomma }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right">Giảm giá hóa đơn:</td>
+                    <td class="text-right pr-3"><b>{{ invoice.discount|intcomma }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right">Khách cần trả:</td>
+                    <td class="text-right pr-3"><b>{{ invoice.must_pay|intcomma }}</b></td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right">Khách đã trả:</td>
+                    <td class="text-right pr-3"><b>{{ invoice.customer_given|intcomma }}</b></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end py-3">
+        {% if invoice.status == 0 %}
+        <button type="button" class="btn btn-success px-3 ml-3"
+                iid={{invoice.id}} onclick="restoreInvoice(this)">
+            <i class="fas fa-window-restore"></i>
+            Phục hồi
+        </button>
+        {% else %}
+        <button type="button" class="btn btn-danger px-3 ml-3"
+                iid={{invoice.id}} onclick="removeInvoice(this)">
+            <i class="fas fa-times mr-2"></i>
+            Huỷ bỏ
+        </button>
+        {% endif %}
+    </div>
+</div>
