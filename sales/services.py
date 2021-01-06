@@ -1,5 +1,6 @@
 from django.db.models import Q
 
+from core.utils import client_timezone
 from elasticsearch_client import es as elasticsearch
 from products.models import Product
 from sales.exceptions import OrderDoesNotExists, SalesException
@@ -90,7 +91,7 @@ class SalesManagement:
                                     invoice_code=invoice.invoice_code,
                                     total=invoice.must_pay,
                                     total_product=invoice.total_products,
-                                    time_created=invoice.time_create,
+                                    time_created=client_timezone(invoice.time_create),
                                     staff=invoice.staff.username,
                                     order_id=invoice.order.id,
                                     status=invoice.status)

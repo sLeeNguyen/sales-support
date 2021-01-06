@@ -31,6 +31,7 @@ class CategoryForm(forms.ModelForm):
 
 class ProductForm(forms.ModelForm):
     product_code = forms.CharField(
+        label="Mã sản phẩm",
         widget=forms.TextInput(attrs={
             'title': 'Mã hàng là thông tin duy nhất.',
             'placeholder': 'Mã tự động',

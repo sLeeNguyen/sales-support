@@ -19,7 +19,7 @@ class ProductListView(LoginRequire, View):
     def get(self, request):
         table_columns = ['', 'Mã sản phẩm', 'Tên sản phẩm', 'Giá bán', 'Giá vốn', 'Tồn kho']
         categories = Category.objects.all()
-        context = {'table_columns': table_columns, 'list_categories': categories}
+        context = {'table_columns': table_columns, 'list_categories': categories, 'active': 'products'}
         return render(request, template_name='product/products.html', context=context)
 
     def post(self, request):
@@ -29,7 +29,7 @@ class ProductListView(LoginRequire, View):
         """
         response = ProductManagement.get_products_datatables(request.POST)
 
-        return HttpResponse(json.dumps(response))
+        return JsonResponse(response)
 
 
 class ProductCreationView(LoginRequire, CreateView):
@@ -42,7 +42,8 @@ class ProductCreationView(LoginRequire, CreateView):
         context = {
             'form': form,
             'action': 'add',
-            'url': reverse('products:product-creation')
+            'url': reverse('products:product-creation'),
+            'active': 'products'
         }
         return render(request, self.template_name, context=context)
 

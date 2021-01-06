@@ -5,17 +5,24 @@ from django.template.loader import render_to_string
 from django.views import View
 
 from core.views import LoginRequire
+from customers.forms import CustomerForm
 from products.models import Product
 from sales import services
 from sales.exceptions import OrderDoesNotExists, SalesException
-from sales.services import SalesManagement
+from sales.models import Invoice
+from sales.services import SalesManagement, TransactionManagement
 
 
 class SalesView(LoginRequire, View):
 
     def get(self, request, *args, **kwargs):
         request.session['orders'] = [{'id': 1, 'data': []}]
-        return render(request, template_name='sales/sales.html', context={'oid': 1})
+        customer_form = CustomerForm()
+        context = {
+            'oid': 1,
+            'form': customer_form
+        }
+        return render(request, template_name='sales/sales.html', context=context)
 
 
 class OrderSessionView(LoginRequire, View):
@@ -38,6 +45,9 @@ class OrderSessionView(LoginRequire, View):
 
     def post(self, request):
         orders = request.session['orders']
+        if len(orders) == 15:
+            response = {"status": "failed", "msg": "Không thể vượt quá 15 hoá đơn cùng lúc."}
+            return JsonResponse(data=response, status=200)
         list_oids = [o['id'] for o in orders]
         list_oids.sort()
 
@@ -47,7 +57,8 @@ class OrderSessionView(LoginRequire, View):
                 new_id += 1
         orders.append({'id': new_id, 'data': []})
         response = {
-            'oid': new_id,
+            "status": "success",
+            "oid": new_id,
         }
         request.session.modified = True
         return JsonResponse(data=response, status=200)
@@ -165,7 +176,7 @@ class CartView(LoginRequire, View):
         return JsonResponse(data=response, status=200)
 
 
-class InvoiceView(LoginRequire, View):
+class PaymentView(LoginRequire, View):
     service_class = SalesManagement
 
     def get(self, request, iid):
@@ -196,3 +207,45 @@ class InvoiceView(LoginRequire, View):
         html = render_to_string(template_name="sales/invoice.html", context=context)
         response["data"] = html
         return JsonResponse(data=response, status=200)
+
+
+class InvoiceListView(LoginRequire, View):
+    service_class = TransactionManagement
+
+    def get(self, request):
+        table_columns = ['', 'Mã hoá đơn', 'Thời gian', 'Khách hàng', 'Giảm giá', 'Tổng hoá đơn']
+        context = {
+            "table_columns": table_columns
+        }
+        return render(request, template_name="invoice/invoice.html", context=context)
+
+    def post(self, request):
+        service = self.service_class(request)
+        response = service.get_invoices_datatables()
+        return JsonResponse(response)
+
+
+class InvoiceDetailUpdateView(LoginRequire, View):
+    service_class = TransactionManagement
+    template_name = "invoice/invoice_detail.html"
+
+    def get(self, request, pk):
+        """
+        Get invoice detail
+        :param request:
+        :param pk: the invoice's id
+        :return: A html represent for invoice
+        """
+        invoice = get_object_or_404(Invoice, pk=pk)
+        return render(request, template_name=self.template_name, context={"invoice": invoice})
+
+    def patch(self, request, pk):
+        """
+        Method for updating invoice status
+        """
+        new_status = int(request.PATCH["status"])
+        invoice = get_object_or_404(Invoice, pk=pk)
+        invoice.status = new_status
+        invoice.save()
+        return HttpResponse(200)
+

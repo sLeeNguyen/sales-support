@@ -1,7 +1,7 @@
 from django.db import models
-from django.db.models import Q
 from django.utils import timezone
 
+from core.utils import server_timezone
 from customers.models import Customer
 from coupons.models import Coupon
 from users.models import User
@@ -13,7 +13,7 @@ class InvoiceManager(models.Manager):
 
     def gen_default_code(self):
         query_set = self.get_queryset()
-        postfix = str(query_set.filter(Q(invoice_code__startswith=self.prefix)).count())
+        postfix = str(query_set.count())
         return self.prefix + '0'*(6 - len(postfix)) + postfix
 
 
@@ -22,7 +22,7 @@ class OrderManager(models.Manager):
 
     def gen_default_code(self):
         query_set = self.get_queryset()
-        postfix = str(query_set.filter(Q(order_code__startswith=self.prefix)).count())
+        postfix = str(query_set.count())
         return self.prefix + '0'*(6 - len(postfix)) + postfix
 
 
@@ -48,12 +48,15 @@ class Order(models.Model):
         super().__init__(*args, **kwargs)
         self.list_product_items = []
 
-    def add_item(self, product, quantity) -> 'ProductItem':
-        product_item = ProductItem(product=product, quantity=quantity, order=self)
+    def add_item(self, product, quantity, price) -> 'ProductItem':
+        product_item = ProductItem(product=product, price=price, quantity=quantity)
         self.list_product_items.append(product_item)
         return product_item
 
     def save_list_items(self):
+        # list product items must be saved after its order be saved
+        for item in self.get_list_product_items():
+            item.order = self
         res = ProductItem.objects.bulk_create(self.list_product_items)
         return res
 
@@ -61,8 +64,11 @@ class Order(models.Model):
              update_fields=None):
         self.order_code = Order.objects.gen_default_code()
         super().save(force_insert, force_update, using, update_fields)
+        self.save_list_items()
 
     def get_list_product_items(self):
+        if len(self.list_product_items) == 0 and self.id:
+            self.list_product_items = list(ProductItem.objects.filter(order=self))
         return self.list_product_items
 
     def calc_total_money(self):
@@ -80,18 +86,24 @@ class Order(models.Model):
             num_of_products += product_item.quantity
         return num_of_products
 
+    def get_customer(self):
+        if self.customer is not None:
+            return self.customer.customer_name
+        return "Khách lẻ"
+
 
 class Invoice(models.Model):
     STATUS_CHOICES = [
-        (0, 'Xoá'),
+        (0, 'Huỷ'),
         (1, 'Hoàn thành'),
     ]
 
     invoice_code = models.CharField(max_length=10, blank=True, null=True)
     time_create = models.DateTimeField(auto_now_add=timezone.now())
     status = models.PositiveIntegerField(default=1, choices=STATUS_CHOICES)
-    total_products = models.PositiveIntegerField(blank=False, null=False)
+    total_products = models.FloatField(blank=False, null=False)
     total = models.PositiveIntegerField(blank=False, null=False)
+    customer_given = models.PositiveIntegerField(blank=True, null=True)
     discount = models.PositiveIntegerField(default=0, blank=True, null=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -104,11 +116,26 @@ class Invoice(models.Model):
         super().save(force_insert, force_update, using, update_fields)
         return self
 
+    def get_time_create_format(self):
+        return server_timezone(self.time_create).strftime("%d/%m/%Y %H:%M")
+
+    def get_staff_name(self):
+        return self.staff.get_display_name()
+
+    @property
+    def must_pay(self):
+        return self.total - self.discount
+
+    @property
+    def refund(self):
+        return self.customer_given - self.must_pay
+
 
 class ProductItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price = models.PositiveIntegerField(default=0)
     quantity = models.PositiveIntegerField(default=0)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def get_sub_total(self):
-        return int(self.product.sell_price * self.quantity)
+        return int(self.price * self.quantity)

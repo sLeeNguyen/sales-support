@@ -1,4 +1,7 @@
-from elasticsearch import Elasticsearch
+from django.conf import settings
+from elasticsearch import Elasticsearch, helpers
+
+from core.utils import server_timezone
 
 DEFAULT = 1
 es = Elasticsearch([{"host": "localhost", "port": 9200, "timeout": 60}])
@@ -10,8 +13,6 @@ default_settings = {
     }
 }
 
-
-
 invoice_index_settings = {
     "settings": default_settings,
     "mappings": {
@@ -21,7 +22,7 @@ invoice_index_settings = {
             "invoice_code": {"type": "keyword"},
             "time_created": {"type": "date"},
             "total": {"type": "integer"},
-            "total_product": {"type": "integer"},
+            "total_product": {"type": "float"},
             "staff": {"type": "keyword"},
             "order_id": {"type": "integer"},
             "status": {"type": "integer"},
@@ -37,9 +38,11 @@ product_item_index_settings = {
             "store_id": {"type": "keyword"},
             "order_id": {"type": "keyword"},
             "product_id": {"type": "keyword"},
-            "product_name": {"type": "string", "index": "not_analyzed"},
-            "quantity": {"type": "integer"},
-            "price": {"type": "integer"}
+            "product_name": {"type": "keyword"},
+            "quantity": {"type": "float"},
+            "price": {"type": "integer"},
+            "cost_price": {"type": "integer"},
+            "time_created": {"type": "date"}
         }
     }
 }
@@ -52,11 +55,11 @@ product_index_setting = {
             "store_id": {"type": "keyword"},
             "barcode": {"type": "keyword"},
             "product_code": {"type": "keyword"},
-            "product_name": {"type": "string"},
-            "description": {"type": "string"},
+            "product_name": {"type": "text"},
+            "description": {"type": "text"},
             "cost_price": {"type": "integer"},
             "sell_price": {"type": "integer"},
-            "unit": {"type": "string", "index": "not_analyzed"},
+            "unit": {"type": "keyword"},
             "status": {"type": "integer"},
             "category_id": {"type": "keyword"},
         }
@@ -91,7 +94,7 @@ def index_invoice(invoice_id, invoice_code, total, total_product,
 
 
 def index_product_item(pid, order_id, product_id, product_name, quantity,
-                       price, store_id=DEFAULT, **kwargs):
+                       price, time_created, store_id=DEFAULT, **kwargs):
     body = {
         "id": pid,
         "store_id": store_id,
@@ -100,6 +103,7 @@ def index_product_item(pid, order_id, product_id, product_name, quantity,
         "product_name": product_name,
         "quantity": quantity,
         "price": price,
+        "time_created": time_created
     }
     body.update(kwargs)
     return es.index(index="product_item", body=body, id=pid)
@@ -124,6 +128,27 @@ def index_product(pid, barcode, product_code, product_name, description, cost_pr
     return es.index(index="product", body=body, id=pid)
 
 
+def bulk_index_product_item(list_product_items):
+    actions = [
+        {
+            "_index": "product_item",
+            "_id": item.id,
+            "_source": {
+                "id": item.id,
+                "store_id": DEFAULT,
+                "order_id": item.order.id,
+                "product_id": item.product.id,
+                "product_name": item.product.product_name,
+                "quantity": item.quantity,
+                "price": item.price,
+                "time_created": item.order.time_create
+            }
+        }
+        for item in list_product_items
+    ]
+    helpers.bulk(es, actions)
+
+
 def search(script, index, filter_path=None):
     return es.search(body=script, index=index, filter_path=filter_path)
 
@@ -138,3 +163,184 @@ def product_item_delete(doc_id):
 
 def product_delete(doc_id):
     es.delete(index="product", id=doc_id)
+
+
+def build_revenue_aggregation_scripts(group_name, timezone, from_time, to_time, store_id=DEFAULT):
+    if group_name == "day":
+        script = {
+            "lang": "painless",
+            "source": "doc['time_created'].value.withZoneSameInstant(ZoneId.of("
+                      "'{timezone}')).getDayOfMonth()".format(timezone=timezone)
+        }
+    elif group_name == "hour":
+        script = {
+            "lang": "painless",
+            "source": "doc['time_created'].value.withZoneSameInstant(ZoneId.of("
+                      "'{timezone}')).getHour()".format(timezone=timezone)
+        }
+    elif group_name == "dayofweek":
+        script = {
+            "lang": "painless",
+            "source": "doc['time_created'].value.withZoneSameInstant(ZoneId.of("
+                      "'{timezone}')).getDayOfWeek().getValue()".format(timezone=timezone)
+        }
+    script_template = {
+        "query": {
+            "bool": {
+                "must": [
+                    {"term": {"store_id": store_id}}
+                ],
+                "filter": {
+                    "range": {
+                        "time_created": {
+                            "gte": from_time,
+                            "lt": to_time,
+                            "time_zone": timezone
+                        }
+                    }
+                }
+            }
+        },
+        "size": 0,
+        "aggs": {
+            group_name: {
+                "terms": {
+                    "script": script,
+                    "order": {
+                        "_key": "asc"
+                    },
+                    "min_doc_count": 1
+                },
+                "aggs": {
+                    "revenue": {
+                        "sum": {
+                            "field": "total"
+                        }
+                    },
+                    "total_product": {
+                        "sum": {
+                            "field": "total_product"
+                        }
+                    }
+                }
+            },
+            "total_revenue": {
+                "sum": {"field": "total"}
+            }
+        }
+    }
+    return script_template
+
+
+def build_top_product_aggregation_scripts(group_name, timezone, from_time, to_time, store_id=DEFAULT):
+    if group_name == "revenue":
+        sum_scripts = {"script": "doc['price'].value * doc['quantity'].value"}
+    elif group_name == "quantity":
+        sum_scripts = {"field": "quantity"}
+    script_template = {
+        "query": {
+            "bool": {
+                "must": [
+                    {"term": {"store_id": store_id}}
+                ],
+                "filter": {
+                    "range": {
+                        "time_created": {
+                            "gte": from_time,
+                            "lt": to_time,
+                            "time_zone": timezone
+                        }
+                    }
+                }
+            }
+        },
+        "size": 0,
+        "aggs": {
+            group_name: {
+                "terms": {
+                    "field": "product_id",
+                    "size": 10,
+                    "order": {"total.value": "desc"}
+                },
+                "aggs": {
+                    "total": {
+                        "sum": sum_scripts
+                    },
+                    "product_name": {
+                        "top_hits": {
+                            "sort": [{"time_created": {"order": "desc"}}],
+                            "_source": ["product_name"],
+                            "size": 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return script_template
+
+
+def aggregate_sales_today(yesterday, today_begin, today, last_month_begin, last_month,
+                          timezone=settings.TIME_ZONE, store_id=DEFAULT):
+    script = {
+        "query": {"bool": {"must": [{"term": {"store_id": store_id}}]}},
+        "size": 0,
+        "aggs": {
+            "yesterday_today": {
+                "filter": {"range": {"time_created": {"gte": yesterday, "lte": today, "time_zone": timezone}}},
+                "aggs": {
+                    "group_by_day": {
+                        "date_histogram": {
+                            "field": "time_created",
+                            "calendar_interval": "day",
+                            "min_doc_count": 0,
+                            "extended_bounds": {
+                                "min": yesterday,
+                                "max": today
+                            },
+                            "order": {
+                                "_key": "asc"
+                            }
+                        },
+                        "aggs": {"group_by_fees": {"sum": {"field": "total"}}}
+                    }
+                }
+            },
+            "lastmonth": {
+                "filter": {
+                    "range": {"time_created": {"gte": last_month_begin, "lte": last_month, "time_zone": timezone}}
+                },
+                "aggs": {"group_by_fees": {"sum": {"field": "total"}}}
+            },
+            "now": {
+                "filter": {
+                    "range": {"time_created": {"gte": today_begin, "lte": today, "time_zone": timezone}}
+                },
+                "aggs": {"group_by_fees": {"sum": {"field": "total"}}}
+            }
+        }
+    }
+    filter_path = ["aggregations"]
+    res = search(script, index="invoice", filter_path=filter_path)
+    yesterday_today = res["aggregations"]["yesterday_today"]
+    last_month = res["aggregations"]["lastmonth"]
+    now = res["aggregations"]["now"]
+    print(res)
+    return {
+        "yesterday": {
+            "total_invoices": yesterday_today["group_by_day"]["buckets"][0]["doc_count"],
+            "revenue": int(yesterday_today["group_by_day"]["buckets"][0]["group_by_fees"]["value"])
+        },
+        "today": {
+            "total_invoices": yesterday_today["group_by_day"]["buckets"][1]["doc_count"],
+            "revenue": int(yesterday_today["group_by_day"]["buckets"][1]["group_by_fees"]["value"])
+        },
+        "lastmonth": {
+            "total_invoices": last_month["doc_count"],
+            "revenue": int(last_month["group_by_fees"]["value"])
+        },
+        "now": {
+            "total_invoices": now["doc_count"],
+            "revenue": int(now["group_by_fees"]["value"])
+        }
+    }

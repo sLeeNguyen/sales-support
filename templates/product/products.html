@@ -136,9 +136,13 @@
         $('#p-detail-update').fadeIn();
 
         $('#btn-close').on('click', function() {
-            $('#p-detail-update').fadeOut();
-            $('#p-detail-update').empty();
+            flushOverlay();
         });
+    }
+
+    function flushOverlay() {
+        $('#p-detail-update').fadeOut();
+        $('#p-detail-update').empty();
     }
 
     $(document).ready(function() {
@@ -211,8 +215,6 @@
                 }
                 $(this).toggleClass('selected-all');
             });
-
-
         });
 
         // add event when table redraw
@@ -242,8 +244,7 @@
                             show(result);
                             productFormSetUp();
                             formCallAjax("#product-form", null, function() {
-                                $('#p-detail-update').empty();
-                                $('#p-detail-update').attr('hidden', true);
+                                flushOverlay();
                                 successNotification({
                                     title: "Thành công",
                                     message: "Cập nhật thành công",
@@ -278,8 +279,7 @@
                             },
                             success: function(result) {
                                 if (result["status"] == "success") {
-                                    $('#p-detail-update').empty();
-                                    $('#p-detail-update').attr('hidden', true);
+                                    flushOverlay();
                                     successNotification({
                                         message: "Thay đổi thành công",
                                     })
@@ -310,8 +310,7 @@
                             },
                             success: function(result) {
                                 if (result["status"] == "success") {
-                                    $('#p-detail-update').empty();
-                                    $('#p-detail-update').attr('hidden', true);
+                                    flushOverlay();
                                     successNotification({
                                         message: "Thay đổi thành công",
                                     })
@@ -433,8 +432,7 @@
                     },
                     success: function(result) {
                         if (result["status"] == "success") {
-                            $('#p-detail-update').empty();
-                            $('#p-detail-update').attr('hidden', true);
+                            flushOverlay();
                             successNotification({
                                 message: "Thay đổi thành công",
                             })
@@ -462,8 +460,7 @@
                     },
                     success: function(result) {
                         if (result["status"] == "success") {
-                            $('#p-detail-update').empty();
-                            $('#p-detail-update').attr('hidden', true);
+                            flushOverlay();
                             successNotification({
                                 message: "Thay đổi thành công",
                             })

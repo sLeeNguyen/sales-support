@@ -34,7 +34,7 @@ class Product(models.Model):
     UNIT_INT = 'INT'
 
     UNIT_CHOICES = [
-        (UNIT_GRAM, '100 gram'),
+        (UNIT_GRAM, 'gram'),
         (UNIT_KILOGRAM, 'kilogram'),
         (UNIT_INT, 'chiếc/cái')
     ]

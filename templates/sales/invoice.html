@@ -170,7 +170,7 @@
                     <span style="font-size: 13px; color:#292929;">Đơn giá: {{ pitem.product.sell_price|intcomma }}</span>
                 </td>
                 <td>{{ pitem.quantity|intcomma }}</td>
-                <td>{{ pitem.product.sell_price|mul:pitem.quantity|to_int|intcomma }}</td>
+                <td>{{ pitem.get_sub_total|intcomma }}</td>
             </tr>
             {% endfor %}
 <!--            <tr class="item">-->
@@ -191,7 +191,15 @@
             </tr>
             <tr class="total">
                 <td colspan="2">Tổng thanh toán:</td>
-                <td>{{ invoice.total|sub:invoice.discount|intcomma }}</td>
+                <td>{{ invoice.must_pay|intcomma }}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="2">Tiền khách trả:</td>
+                <td>{{ invoice.customer_given|intcomma }}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="2">Tiền thừa trả khách:</td>
+                <td>{{ invoice.refund|intcomma }}</td>
             </tr>
         </table>
         <div style="text-align: center; margin-top: 20px;"><i>Xin chân trọng cảm ơn quý khách!</i></div>

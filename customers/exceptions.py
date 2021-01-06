@@ -1,0 +1,2 @@
+class FormInvalidException(Exception):
+    pass
