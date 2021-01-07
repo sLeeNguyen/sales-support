@@ -1,5 +1,5 @@
 :root {
-    --main-bg-color: #0098be;
+    --main-bg-color: #0b82c8;
     --main-font-size: 0.9375rem;
 }
 
@@ -12,6 +12,7 @@
 html, body {
     height: 100%;
     width: 100%;
+    background-color: #eee;
 }
 
 body {
@@ -22,8 +23,16 @@ header, nav, .main-content {
     padding: 0 1rem;
 }
 
+header {
+    background-color: #fff;
+}
+
 .row {
     margin: 0px !important;
+}
+
+.txtBlue {
+    color: #0094da;
 }
 
 .logo-side > img {
@@ -114,6 +123,144 @@ table.dataTable tbody tr.selected {
     background-color: #B0BED9;
 }
 
+/*.dashboard-left {*/
+/*    float: left;*/
+/*    width: calc(100% - 320px);*/
+/*    padding-bottom: 10px;*/
+/*}*/
+
+/*.dashboard-right {*/
+/*    float: none;*/
+/*    width: auto;*/
+/*    margin-left: calc(100% - 300px);*/
+/*    background-color: #292929;*/
+/*    height: 100px;*/
+/*}*/
+
+.dashboard-title {
+    padding-top: 10px;
+    margin-bottom: 5px;
+    padding-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    overflow: hidden;
+}
+
+.dashboard-box {
+    padding: 10px 0;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.08) 3px 5px rgba(0,0,0,.5);
+    box-shadow: 0 2px 5px rgba(0,0,0,.08) 3px 5px rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.08);
+    box-shadow: 0 2px 5px rgba(0,0,0,.08);
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.detail ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.detail ul li {
+    position: relative;
+    color: #6c6969;
+    font-size: 12px;
+    padding: 6px 20px 6px 50px;
+    text-align: left;
+    display: inline-table;
+    height: auto;
+    vertical-align: middle;
+    min-height: 72px;
+    white-space: nowrap;
+    margin: 4px 25px 8px 0;
+    box-sizing: border-box;
+    width: 100%;
+    border-bottom: 1px solid #dad9d9;
+}
+
+.detail ul li .dash_title {
+    font-weight: 700;
+    color: #666;
+    margin: 0 0 0 2px;
+}
+
+.detail ul li .dash_icon {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    position: absolute;
+    top: 14px;
+    left: 5px;
+    background: #4bac4d;
+    text-align: center;
+    border-radius: 100%;
+    color: #fff;
+    line-height: 32px;
+}
+.detail ul li.total .dash_icon {
+    background: #0094da;
+}
+.detail ul li.return .dash_icon {
+    background: #ff8030;
+}
+
+.detail ul li.customer .dash_icon {
+    background: #18c0c2;
+}
+
+.detail ul li.down .dash_icon {
+    background: #f94f5e;
+}
+
+.detail ul li span.number {
+    display: block;
+    font-size: 22px;
+    line-height: 28px;
+}
+
+.detail ul li.total span.number {
+    color: #0094da;
+}
+
+.detail ul li.return span.number {
+    color: #ff8030;
+}
+
+.detail ul li.customer span.number {
+    color: #18c0c2;
+}
+
+.detail ul li.down span.number {
+    color: #f94f5e;
+}
+
+.detail ul li .dash_icon .fa {
+    font-size: 16px;
+    text-shadow: 1px 1px 1px rgba(0,0,0,.3);
+}
+
+.dashboard-title .revenue .fa {
+    color: #b6b6b6;
+}
+
+.group-by ul {
+    list-style: none;
+    display: flex;
+}
+
+.group-by ul li {
+    padding: 0px 5px 2px;
+    cursor: pointer;
+}
+
+.group-by ul li.selected {
+    border-bottom: 2px solid #007dc5;
+}
+
 @media (min-width: 576px) {
     .nav-block {
         position: relative;
@@ -138,13 +285,36 @@ table.dataTable tbody tr.selected {
     }
 }
 
+@media (min-width: 700px) {
+    .detail ul li {
+        border: none;
+        width: auto;
+        max-width: calc(100% / 4);
+        border-right: 1px solid #dad9d9;
+    }
+}
+
 @media (min-width: 992px) {
     header, nav, .main-content {
-        padding: 0 4rem;
+        padding: 0 2rem;
     }
 
     .nav-block {
         position: relative;
+    }
+
+    .dashboard-left {
+        float: left;
+        width: calc(100% - 320px);
+        padding-bottom: 10px;
+    }
+
+    .dashboard-right {
+        float: none;
+        width: auto;
+        margin-left: calc(100% - 300px);
+        background-color: #292929;
+        height: 100px;
     }
 }
 

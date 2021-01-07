@@ -1,5 +1,5 @@
 :root {
-    --main-bg-color: #0098be;
+    --main-bg-color: #0b82c8;
     --main-font-size: 0.9375rem;
 }
 
@@ -51,9 +51,12 @@ html, body {
 }
 
 .header-search .search-bar i {
+    color: #a1a7ad;
+}
+
+.header-search .search-bar > i {
     position: absolute;
     left: 5px;
-    color: #a1a7ad;
 }
 
 .search-bar .result {
@@ -61,11 +64,11 @@ html, body {
     max-height: 500px;
     background-color: white;
     width: 100%;
-    top: 90%;
+    top: 105%;
     z-index: 9999;
     box-shadow: 0 5px 15px #deddd9;
     border-radius: 3px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .search-bar .result .product-avt img {
@@ -109,7 +112,7 @@ html, body {
 }
 
 .sell-right .input-border-bottom {
-    border-color: black;
+    border-color: #d8d6d6;
     border-width: 0px 0px 1px 0px;
     border-radius: 0px;
     font-size: var(--main-font-size);
@@ -123,6 +126,18 @@ html, body {
 
 .sell-right .search-bar i {
     font-size: 0.9rem;
+}
+
+.header-search .search-bar .add-customer {
+    position: absolute;
+    left: 93%;
+    padding: 1px 6px;
+    border-radius: 50%;
+}
+
+.header-search .search-bar .add-customer:hover {
+    background-color: #f1f1f1;
+    transition: 0.5s all;
 }
 
 .sell-right .invoice-title {
@@ -221,6 +236,44 @@ html, body {
     border-radius: 3px;
 }
 
+.header-right .more {
+    position: relative;
+}
+
+.header-right .more ul {
+    position: absolute;
+    top: 100%;
+    right: -20px;
+    background-color: var(--main-bg-color);
+    z-index: 10;
+    min-width: 200px;
+    border-radius: 3px;
+    list-style: none;
+}
+
+.header-right .more ul li a {
+    display: flex;
+    padding: 5px 10px;
+    color: #ffffffeb;
+    font-size: 0.9rem;
+    text-decoration: none;
+    align-items: center;
+}
+
+.header-right .more ul li:hover a {
+    color: white;
+}
+
+.header-right .more ul li a i {
+    font-size: 0.95rem;
+}
+
+.header-right .more ul li:hover {background-color: #0000003d;}
+
+.header-right .more ul li {
+    padding: 5px 0;
+}
+
 .header-right .more i {
     font-size: 1.3rem;
 }
@@ -266,6 +319,72 @@ i.available.fas.fa-exclamation-triangle.invalid {
     display: initial !important;
 }
 
+#customer-form {
+    font-size: 0.8rem;
+}
+
+.customer-show {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--main-bg-color);
+    height: 40px;
+    color: #a1a7ad;
+}
+
+.customer-show > span {
+    font-size: 0.8rem;
+    background-color: #c0c5ca70;
+    padding: 3px 5px;
+    cursor: pointer;
+    border-radius: 3px;
+    color: #005592;
+    font-weight: bold;
+}
+
+.customer-show i.fa-times {
+    position: absolute;
+    left: 97.7%;
+    padding: 5px 7px;
+    border-radius: 50%;
+}
+
+.customer-show i.fa-times:hover {
+    background-color: #f1f1f1;
+    transition: 0.5s all;
+}
+
+#customer-search-result ul {
+    list-style: none;
+}
+
+.customer-item {
+    padding: 10px 15px;
+}
+
+.customer-item .customer-name {
+    font-size: var(--main-font-size);
+}
+
+.customer-item .customer-code {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.customer-item .customer-address {
+    font-size: 0.8rem;
+}
+
+li.customer-item:hover {
+    background-color: var(--main-bg-color);
+    color: white;
+}
+
+.no-data {
+    font-size: var(--main-font-size);
+    color: #888888;
+    text-align: center;
+}
+
 /*@media screen and (min-width: )*/
 
 @media screen and (min-width: 998px) {
@@ -306,14 +425,12 @@ i.available.fas.fa-exclamation-triangle.invalid {
     }
 
     .sell-main .sell-left {
-        height: 100%;
         width: 100%;
     }
 
     .sell-main .sell-right {
         min-width: 350px;
         max-width: 350px;
-        height: 100%;
         padding: 10px;
     }
 }

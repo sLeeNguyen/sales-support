@@ -1,0 +1,30 @@
+{% load widget_tweaks %}
+
+<div class="form-group d-flex align-items-center">
+    <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label font-weight-bold">
+        {{ field.label }}
+        {% if field.field.widget.attrs.title %}
+        <i class="fas fa-info-circle ml-2" data-toggle="tooltip" data-placement="right"
+           title="{{ field.field.widget.attrs.title }}"></i>
+        {% endif %}
+    </label>
+    <div class="col-md-8">
+        {% if form.is_bound %}
+            {% if field.errors %}
+                {% render_field field class+="form-control form-control-sm is-invalid" %}
+                {% for error in field.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+                {% endfor %}
+            {% else %}
+                {% render_field field class+="form-control form-control-sm is-valid" %}
+            {% endif %}
+        {% else %}
+                {% render_field field class+="form-control form-control-sm removeLater" %}
+        {% endif %}
+
+        {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+    </div>
+</div>
+

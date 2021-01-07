@@ -1,0 +1,41 @@
+{% load widget_tweaks %}
+<form id="customer-form" method="post" action="{% url 'customers:customer' %}"
+      enctype="multipart/form-data" class="mt-3 mb-3" novalidate>
+    {% csrf_token %}
+    {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field }}
+        {% endfor %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-6">
+            {% include 'customer/input.html' with field=form.customer_code %}
+            {% include 'customer/input.html' with field=form.customer_name %}
+            {% include 'customer/input.html' with field=form.address %}
+            {% include 'customer/input.html' with field=form.birthday %}
+            {% include 'customer/input.html' with field=form.gender %}
+        </div>
+        <div class="col-md-6">
+            {% include 'customer/input.html' with field=form.phone_number %}
+            {% include 'customer/input.html' with field=form.email %}
+            {% include 'customer/input.html' with field=form.note %}
+            {% include 'customer/input.html' with field=form.group_type %}
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mx-3">
+        <button type="submit" class="btn btn-success mr-2 mw-110">
+            <i class="fas fa-save mr-2" onclick="submitCustomer()"></i>
+            Lưu
+        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-2"></i>
+            Đóng
+        </button>
+    </div>
+</form>
