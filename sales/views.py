@@ -6,6 +6,8 @@ from django.views import View
 
 from core.views import LoginRequire
 from customers.forms import CustomerForm
+from customers.models import Customer
+from customers.services import CustomerManagement
 from products.models import Product
 from sales import services
 from sales.exceptions import OrderDoesNotExists, SalesException
@@ -41,6 +43,8 @@ class OrderSessionView(LoginRequire, View):
             "order": html,
             "payment": service.make_payment()
         }
+        if "customer" in order:
+            response.update({"customer": order["customer"]})
         return JsonResponse(data=response, status=200)
 
     def post(self, request):
@@ -97,12 +101,27 @@ class OrderView(LoginRequire, View):
         return JsonResponse(data=response, status=200)
 
 
-class SearchView(LoginRequire, View):
+class SearchProductView(LoginRequire, View):
     def get(self, request):
         query = request.GET.get('q')
         products = services.search_products(query)
         html = render(request, template_name='sales/product_search_item.html', context={'data': products})
         return HttpResponse(html)
+
+
+class SearchCustomerView(LoginRequire, View):
+    service_class = CustomerManagement
+
+    def get(self, request):
+        key_search = request.GET.get('q')
+        result = self.service_class.search_customer_by_key(key_search)
+        if result["num_of_results"] == 0:
+            context = {"empty": True}
+        else:
+            context = {
+                "list_customers": result["list_customers"]
+            }
+        return render(request=request, template_name="sales/customer_search_item.html", context=context)
 
 
 class CartView(LoginRequire, View):
@@ -176,6 +195,34 @@ class CartView(LoginRequire, View):
         return JsonResponse(data=response, status=200)
 
 
+class OrderCustomerView(LoginRequire, View):
+    service_class = SalesManagement
+
+    def patch(self, request, oid):
+        try:
+            service = self.service_class(request, oid)
+        except OrderDoesNotExists:
+            return HttpResponse(status=404)
+        customer_id = request.PATCH.get("customerId")
+        customer = get_object_or_404(Customer, pk=customer_id)
+        service.add_customer_to_order(customer)
+        request.session.modified = True
+        response = {
+            "id": customer.id,
+            "name": customer.customer_name
+        }
+        return JsonResponse(data=response, status=200)
+
+    def delete(self, request, oid):
+        try:
+            service = self.service_class(request, oid)
+            service.remove_customer()
+            request.session.modified = True
+        except OrderDoesNotExists:
+            return HttpResponse(status=404)
+        return HttpResponse(status=200)
+
+
 class PaymentView(LoginRequire, View):
     service_class = SalesManagement
 
@@ -203,6 +250,7 @@ class PaymentView(LoginRequire, View):
         context = {
             "invoice": invoice,
             "list_product_items": invoice.order.get_list_product_items(),
+            "customer": invoice.order.customer
         }
         html = render_to_string(template_name="sales/invoice.html", context=context)
         response["data"] = html
@@ -248,4 +296,3 @@ class InvoiceDetailUpdateView(LoginRequire, View):
         invoice.status = new_status
         invoice.save()
         return HttpResponse(200)
-

@@ -1,13 +1,13 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
 from django.views import View
 
+from core.views import LoginRequire
 from customers.exceptions import FormInvalidException
 from customers.forms import CustomerForm
 from customers.services import CustomerManagement
 
 
-class CustomerView(View):
+class CustomerView(LoginRequire, View):
     form_class = CustomerForm
     template_name = "customer/customer_form.html"
     service_class = CustomerManagement

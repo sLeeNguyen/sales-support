@@ -80,8 +80,7 @@
                 <i class="fas fa-search hand"></i>
                 <input class="input-border-bottom" type="search" placeholder="Tìm kiếm khách hàng"
                        oninput="searchCustomer(this)">
-
-                <span class="add-customer" title="Thêm khách hàng" data-toggle="tooltip" data-placement="bottom">  
+                <span class="add-customer" title="Thêm khách hàng" data-toggle="tooltip" data-placement="bottom">
                     <i class="fas fa-plus hand" data-toggle="modal" data-target="#add-customer-modal"></i>
                 </span>
                 <div id="customer-search-result" class="result" hidden>
@@ -91,7 +90,8 @@
         <div class="customer-show" style="display: none;">
             <i class="fa fa-user mr-2"></i>
             <span id="customer-name" cid="">Nguyen Ba Ngoc</span>
-            <i class="fas fa-times hand" title="Xoá khách hàng" data-toggle="tooltip" data-placement="bottom"></i>
+            <i class="fas fa-times hand" title="Xoá khách hàng"
+               data-toggle="tooltip" data-placement="bottom" onclick="removeCustomerFromOrder()"></i>
         </div>
         <div class="mt-5 d-flex px-3">
             <span class="px-3 py-1 invoice-title">Hoá đơn</span>
@@ -124,8 +124,7 @@
         </div>
         <div class="note">
             <i class="fas fa-pencil-alt"></i>
-            <input id="note" class="input-border-bottom " type="text" placeholder="Ghi chú"
-                   oninput="searchCustomer(this)">
+            <input id="note" class="input-border-bottom " type="text" placeholder="Ghi chú">
         </div>
         <div class="submit d-flex justify-content-center mt-5">
             <button id="payment" type="button" class="btn btn-success mx-2">Thanh toán</button>
@@ -150,6 +149,7 @@
 
         $("body").click(function (e) {
             $('#search-result').attr("hidden", true);
+            $('#customer-search-result').attr("hidden", true);
 
             if (e.target != $(".header-right .more")[0] && e.target != $(".header-right .more i")[0]) {
                 $(".header-right .more ul").fadeOut(200);
@@ -185,7 +185,6 @@
                             title: "Lưu thành công"
                         });
                     } else {
-                        console.log(data);
                         errorNotification({
                             title: "Lỗi!",
                             message: data.msg,
@@ -237,7 +236,6 @@
     });
 
     function validateOrder() {
-
         if ($(".available.fas.fa-exclamation-triangle.invalid").length > 0) return false;
         return true;
     }
@@ -274,7 +272,11 @@
     function search(ele) {
         var search_val = $(ele).val();
 
-        if (search_val == "") return;
+        if (search_val == "") {
+            $("#search-result").attr("hidden", true);
+            $("#search-result").empty();
+            return;
+        }
 
         $.ajax({
             url: "{% url 'sales:search' %}",
@@ -291,7 +293,25 @@
     }
 
     function searchCustomer(ele) {
+        var search_val = $(ele).val();
+        if (search_val == "") {
+            $("#customer-search-result").attr("hidden", true);
+            $("#customer-search-result").empty();
+            return;
+        }
 
+        $.ajax({
+            url: "{% url 'sales:customer-search' %}",
+            method: 'GET',
+            data: {
+                q: search_val
+            },
+            success: function (data) {
+                $("#customer-search-result").empty();
+                $("#customer-search-result").append(data);
+                $("#customer-search-result").attr("hidden", false);
+            }
+        });
     }
 
     function changeProductQuantity(ele) {
@@ -383,7 +403,7 @@
             success: function (data) {
                 if (data.status == "success") {
                     $('li.selected').toggleClass('selected');
-                    $('#list-tab').append(`<li class="invoice selected hand" oid=${data.oid}>
+                    $('#list-tab').append(`<li id="tab-${data.oid}" class="invoice selected hand" oid=${data.oid}>
                                                 <span oid=${data.oid} onclick="changeTab(this)" style="height: 100%;display: flex;align-items: center;">
                                                     Hoá đơn ${data.oid}</span>
                                                 <i class="fas fa-times ml-1" onclick="removeOrder(this)"></i>
@@ -408,7 +428,7 @@
     }
 
     function removeOrder(ele) {
-        if ($("#list-tab").children().length == 1 && $("#list-tab #tab-1").length > 0) return;
+        // if ($("#list-tab").children().length == 1 && $("#list-tab #tab-1").length > 0) return;
         const li_html = $(ele).parent();
         const oid = $(li_html).attr('oid');
         callRemoveOrderApi(li_html, oid);
@@ -419,7 +439,7 @@
             url: `order-session/${oid}/`,
             method: 'DELETE',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            success: function () {
+            success: function() {
                 if ($(li_html).hasClass('selected')) {
                     if ($('#list-tab').children().length == 1) {
                         $('#list-tab').append(`<li id="tab-1" class="invoice selected hand" oid=1>
@@ -452,6 +472,8 @@
             success: function (data) {
                 $('#cart').replaceWith(data.order);
                 $('[data-toggle="tooltip"]').tooltip();
+                if (data.customer) showCustomer(data.customer);
+                else hideCustomer();
                 setPaymentData(data.payment);
             }
         });
@@ -473,12 +495,44 @@
         $("#note").val("");
     }
 
-    function addCustomerToOrder(customer) {
-
+    function addCustomerToOrder(ele) {
+        const cid = $(ele).attr("cid");
+        $.ajax({
+            url: `/sales/cart/${cartId}/customer/`,
+            method: "PATCH",
+            headers: {'X-CSRFToken': '{{csrf_token}}'},
+            data: {
+                customerId: cid
+            },
+            success: function(data) {
+                showCustomer(data);
+            },
+            error: function() {
+                errorNotification({
+                    title: "Xảy ra lỗi!"
+                });
+            }
+        });
     }
 
     function removeCustomerFromOrder() {
-
+        $.ajax({
+            url: `/sales/cart/${cartId}/customer/`,
+            method: "DELETE",
+            headers: {'X-CSRFToken': '{{csrf_token}}'},
+            success: function() {
+                hideCustomer();
+                successNotification({
+                    title: "Thành công",
+                    message: "Đã xoá khách hàng khỏi đơn hàng."
+                });
+            },
+            error: function() {
+                errorNotification({
+                    title: "Xảy ra lỗi!"
+                });
+            }
+        })
     }
 
 </script>

@@ -64,11 +64,11 @@ html, body {
     max-height: 500px;
     background-color: white;
     width: 100%;
-    top: 90%;
+    top: 105%;
     z-index: 9999;
     box-shadow: 0 5px 15px #deddd9;
     border-radius: 3px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .search-bar .result .product-avt img {
@@ -351,6 +351,38 @@ i.available.fas.fa-exclamation-triangle.invalid {
 .customer-show i.fa-times:hover {
     background-color: #f1f1f1;
     transition: 0.5s all;
+}
+
+#customer-search-result ul {
+    list-style: none;
+}
+
+.customer-item {
+    padding: 10px 15px;
+}
+
+.customer-item .customer-name {
+    font-size: var(--main-font-size);
+}
+
+.customer-item .customer-code {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.customer-item .customer-address {
+    font-size: 0.8rem;
+}
+
+li.customer-item:hover {
+    background-color: var(--main-bg-color);
+    color: white;
+}
+
+.no-data {
+    font-size: var(--main-font-size);
+    color: #888888;
+    text-align: center;
 }
 
 /*@media screen and (min-width: )*/

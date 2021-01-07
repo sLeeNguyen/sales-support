@@ -1,6 +1,8 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
 from core.utils import client_timezone
+from customers.models import Customer
 from elasticsearch_client import es as elasticsearch
 from products.models import Product
 from sales.exceptions import OrderDoesNotExists, SalesException
@@ -41,9 +43,17 @@ class SalesManagement:
         return None, None
 
     def create_new_order(self, note=None, status=1):
+        customer = None
+        if "customer" in self.current_order:
+            try:
+                customer = Customer.objects.get(pk=self.current_order["customer"]["id"])
+            except ObjectDoesNotExist:
+                raise SalesException("Khách hàng '%s' không tồn tại!" % self.current_order["customer"]["name"])
         order = Order(staff=self.request.user, status=status)
         if note is not None:
             order.note = note
+        if customer is not None:
+            order.customer = customer
 
         products = []
         for product_item in self.current_order['data']:
@@ -63,7 +73,6 @@ class SalesManagement:
         # save list items to elasticsearch
         elasticsearch.bulk_index_product_item(order.get_list_product_items())
         self.order = order
-
         return order
 
     def __valid_order(self, products, quantities):
@@ -111,6 +120,15 @@ class SalesManagement:
             context['index'] = len(order_data)
         return context
 
+    def add_customer_to_order(self, customer):
+        self.current_order["customer"] = {
+            "id": customer.id,
+            "name": customer.customer_name,
+            "code": customer.customer_code,
+            "points": customer.points
+        }
+        return self.current_order
+
     def update_quantity_product_item(self, product_id, quantity):
         product = Product.objects.get(pk=product_id)
         quantity = self.valid_product_quantity(product, quantity)
@@ -155,6 +173,10 @@ class SalesManagement:
             del self.list_orders[self.index]
         if len(self.list_orders) == 0:
             self.list_orders.append({'id': 1, 'data': []})
+
+    def remove_customer(self):
+        if "customer" in self.current_order:
+            self.current_order.pop("customer")
 
     def make_payment(self):
         total_fees = 0

@@ -75,6 +75,9 @@ function showCustomer(customer) {
 }
 
 function hideCustomer() {
+	$(".sell-right .header-search input").val("");
 	$(".sell-right .header-search").fadeIn(0);
 	$(".customer-show").fadeOut(0);
+	$(".customer-show #customer-name").html("");
+	$(".customer-show #customer-name").attr("cid", "");
 }

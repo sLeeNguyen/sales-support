@@ -62,6 +62,10 @@ class Order(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        # update customer points if it exists
+        if self.customer is not None:
+            self.customer.points += self.calc_total_money() // 1000
+            self.customer.save()
         self.order_code = Order.objects.gen_default_code()
         super().save(force_insert, force_update, using, update_fields)
         self.save_list_items()
@@ -71,11 +75,11 @@ class Order(models.Model):
             self.list_product_items = list(ProductItem.objects.filter(order=self))
         return self.list_product_items
 
-    def calc_total_money(self):
+    def calc_total_money(self) -> 'int':
         total = 0
         for product_item in self.list_product_items:
             total += product_item.get_sub_total()
-        return total
+        return int(total)
 
     def calc_discount(self):
         return 0

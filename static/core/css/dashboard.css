@@ -138,7 +138,7 @@ table.dataTable tbody tr.selected {
 /*}*/
 
 .dashboard-title {
-    padding-top: 19px;
+    padding-top: 10px;
     margin-bottom: 5px;
     padding-bottom: 6px;
     font-size: 14px;
@@ -148,6 +148,7 @@ table.dataTable tbody tr.selected {
 }
 
 .dashboard-box {
+    padding: 10px 0;
     border-radius: 5px;
     -webkit-box-shadow: 0 2px 5px rgba(0,0,0,.08) 3px 5px rgba(0,0,0,.5);
     box-shadow: 0 2px 5px rgba(0,0,0,.08) 3px 5px rgba(0,0,0,.5);
@@ -176,8 +177,8 @@ table.dataTable tbody tr.selected {
     white-space: nowrap;
     margin: 4px 25px 8px 0;
     box-sizing: border-box;
-    max-width: calc(100% / 4);
-    border-right: 1px solid #dad9d9;
+    width: 100%;
+    border-bottom: 1px solid #dad9d9;
 }
 
 .detail ul li .dash_title {
@@ -281,6 +282,15 @@ table.dataTable tbody tr.selected {
     .nav-block:hover .dropdown-nav {
         display: flex;
         transition: 0.3s all;
+    }
+}
+
+@media (min-width: 700px) {
+    .detail ul li {
+        border: none;
+        width: auto;
+        max-width: calc(100% / 4);
+        border-right: 1px solid #dad9d9;
     }
 }
 

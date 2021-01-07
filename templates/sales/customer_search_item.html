@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+{% if empty %}
+<div class="text-center pt-3 pb-1"><i class="fas fa-box" style="font-size: 2rem;"></i></div>
+<div class="no-data mb-3">Không tìm được kết quả phù hợp</div>
+{% else %}
+    {% for customer in list_customers %}
+    <ul>
+        <li class="customer-item" cid="{{customer.id}}" onclick="addCustomerToOrder(this)">
+            {% if customer.phone_number %}
+            <div class="customer-name">{{customer.customer_name}} - {{customer.phone_number}}</div>
+            {% else %}
+            <div class="customer-name">{{customer.customer_name}}</div>
+            {% endif %}
+            <div class="customer-address"><span class="font-weight-bold">Địa chỉ:</span> {{customer.address}}</div>
+            <div class="customer-code">Mã: {{customer.customer_code}}</div>
+        </li>
+    </ul>
+    {% endfor %}
+{% endif %}

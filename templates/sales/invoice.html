@@ -134,12 +134,20 @@
                 <td colspan="3">
                     <table>
                         <tr>
+                            {% if customer %}
+                            <td>
+                                Khách hàng: {{ customer.customer_name }}<br>
+                                SĐT: {{ customer.phone_number }}<br>
+                                Địa chỉ: {{ customer.address }}<br>
+                                Điểm tích luỹ: {{ customer.points|intcomma }}
+                            </td>
+                            {% else %}
                             <td>
                                 Khách hàng: Khách lẻ<br>
                                 SĐT: <br>
                                 Địa chỉ: --
                             </td>
-
+                            {% endif %}
                             <td style="text-align: right;">
                                 Cửa hàng: <b>Acme Corp</b><br>
                                 SĐT: 0868686868<br>
