@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+    container_name: es-django
+    restart: on-failure
+    ports:
+      - "9200:9200"
+    environment:
+      - "ES_VERSION=${ES_VERSION}"
+      - "cluster.name=es-docker-cluster"
+      - "discovery.type=single-node"
+      - "bootstrap.memory_lock=true"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+  db:
+    image: mysql:8
+    container_name: database
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE="${MYSQL_DATABASE}"
+      - MYSQL_USER="${MYSQL_USER}"
+      - MYSQL_PASSWORD="${MYSQL_PASSWORD}"
+      - MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}"
+      - MYSQL_HOST="${MYSQL_HOST}"
+    volumes:
+      - /tmp/app/mysqld:/var/run/mysqld
+      - ./db:/var/lib/mysql
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /tmp/app/mysqld:/run/mysqld
+    depends_on:
+      - db
+      - es
