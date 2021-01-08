@@ -74,7 +74,7 @@ class ProductDetailView(LoginRequire, DetailView):
 
         context = {
             self.context_object_name: product,
-            'list_imgs': list_imgs
+            'list_imgs': list_imgs,
         }
         html = render(request, self.template_name, context=context)
         return HttpResponse(html)
@@ -125,7 +125,7 @@ class ProductUpdateView(LoginRequire, View):
 
     def patch(self, request, *args, **kwargs):
         """
-        Change status of product or list products to no sell
+        Change status of product or list products.
         """
         if self.lookup_field in kwargs:
             _id = kwargs[self.lookup_field]
@@ -134,10 +134,11 @@ class ProductUpdateView(LoginRequire, View):
             product.save()
         else:
             ids = request.PATCH.getlist('list_ids[]')
+            new_status = int(request.PATCH.get("newStatus"))
             objs = self.model.objects.filter(id__in=ids)
             if objs and len(objs) > 0:
                 for obj in objs:
-                    obj.status = 2
+                    obj.status = new_status
                 self.model.objects.bulk_update(objs, ['status'])
 
         return JsonResponse({'status': 'success'})

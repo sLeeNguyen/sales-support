@@ -107,6 +107,13 @@
             </button>
         </div>
         <div class="operation-box ml-3">
+            <button id="continue-sell-btn" type="button" class="btn btn-danger px-3" title="Ngừng bán các sản phẩm đã chọn."
+                    data-toggle="tooltip" data-placement="bottom" hidden>
+                <i class="fas fa-ban mr-2"></i>
+                Tiếp tục bán
+            </button>
+        </div>
+        <div class="operation-box ml-3">
             <button id="delete-btn" type="button" class="btn btn-danger px-3 ml-3" title="Xoá các sản phẩm đã chọn."
                     data-toggle="tooltip" data-placement="bottom">
                 <i class="fas fa-trash-alt mr-2"></i>
@@ -399,7 +406,49 @@
                     url: "{% url 'products:product-update' %}",
                     type: 'PATCH',
                     data: {
-                        'list_ids': list_ids.toArray()
+                        'list_ids': list_ids.toArray(),
+                        "newStatus": 2
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function(result) {
+                        if (result["status"] == "success") {
+                            successNotification({
+                                title: "Thành công",
+                            })
+                            datatable.draw();
+                        } else {
+                            errorNotification({
+                                title: "Thất bại!",
+                            })
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#continue-sell-btn').on('click', function(e) {
+            var list_ids = $("#table_id .selected").map((index, ele) => {
+                return $(ele).attr('id');
+            });
+
+            if (list_ids.length == 0) {
+                warningNotification({
+                    message: "Bạn chưa chọn sản phẩm nào",
+                });
+                return;
+            }
+
+            let r = confirm("Tiếp tục bán các sản phẩm đã chọn?");
+            if (r == true) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{% url 'products:product-update' %}",
+                    type: 'PATCH',
+                    data: {
+                        'list_ids': list_ids.toArray(),
+                        "newStatus": 1
                     },
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',
@@ -485,6 +534,13 @@
         $('.form-check').on('click', function(e) {
             $('input[name="product-status"]').attr('checked', false);
             $(this).find("input[name='product-status']").attr('checked', true);
+            if ($('input[name="product-status"]:checked').val() == '1') {
+                $("#no-sell-btn").attr('hidden', false);
+                $("#continue-sell-btn").attr('hidden', true);
+            } else {
+                $("#no-sell-btn").attr('hidden', true);
+                $("#continue-sell-btn").attr('hidden', false);
+            }
             datatable.draw();
         });
     });

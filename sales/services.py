@@ -215,8 +215,15 @@ class TransactionManagement:
         order_type = post['order[0][dir]']
         search_val = post['search[value]']
         invoice_status = int(post.get('invoiceStatus', 1))
+        from_time = post['intervalTime[from]']
+        to_time = post['intervalTime[to]']
+        time_format = "%Y-%m-%d"
+        from datetime import datetime
+        from django.utils.timezone import make_aware, timedelta
+        aware_from_time = make_aware(datetime.strptime(from_time, time_format))
+        aware_to_time = make_aware(datetime.strptime(to_time, time_format)) + timedelta(days=1)
 
-        results = Invoice.objects.filter(status=invoice_status)
+        results = Invoice.objects.filter(status=invoice_status, time_create__range=[aware_from_time, aware_to_time])
         if search_val:
             results = results.filter(
                 Q(invoice_code__icontains=search_val) |
@@ -234,8 +241,8 @@ class TransactionManagement:
                 "1": item.invoice_code,
                 "2": item.get_time_create_format(),
                 "3": item.order.get_customer(),
-                "4": item.discount,
-                "5": item.total,
+                "4": '{:20,d}'.format(item.discount),
+                "5": '{:20,d}'.format(item.total),
                 "DT_RowId": item.id
             })
         return {

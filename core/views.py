@@ -88,6 +88,8 @@ class DashBoardView(LoginRequire, View):
         if analysis["lastmonth"]["total_invoices"] > 0:
             revenue_last_month = analysis["lastmonth"]["revenue"]
             revenue_this_month = analysis["now"]["revenue"]
+            print(revenue_last_month)
+            print(revenue_this_month)
             compare_revenue_with_last_month = (revenue_this_month - revenue_last_month) / revenue_last_month * 100
             data_response["compare_with_lastmonth"] = round(compare_revenue_with_last_month, 2)
 
