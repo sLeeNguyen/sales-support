@@ -91,15 +91,20 @@
 </table>
 <div class="box-function my-3">
 <!--    <h6 class="p-2">Thao tác</h6>-->
-    <div class="sub-box-function d-flex justify-content-center mr-3 ml-3 pt-3 pb-3">
-        <div class="operation-box ml-3">
-            <button type="button" class="btn btn-danger px-3 ml-3" title="Huỷ các hoá đơn đã chọn."
-                    data-toggle="tooltip" data-placement="bottom">
-                <i class="fas fa-times mr-2"></i>
-                Huỷ bỏ
-            </button>
-        </div>
-    </div>
+<!--    <div class="sub-box-function d-flex justify-content-center mr-3 ml-3 pt-3 pb-3">-->
+<!--        <div class="operation-box ml-3">-->
+<!--            <button id="remove-btn" type="button" class="btn btn-danger px-3 ml-3" title="Huỷ các hoá đơn đã chọn."-->
+<!--                    data-toggle="tooltip" data-placement="bottom">-->
+<!--                <i class="fas fa-times mr-2"></i>-->
+<!--                Huỷ bỏ-->
+<!--            </button>-->
+<!--            <button id="restore-btn" type="button" class="btn btn-success px-3" title="Khôi phục các hoá đơn đã chọn."-->
+<!--                    data-toggle="tooltip" data-placement="bottom" hidden>-->
+<!--                <i class="fas fa-window-restore mr-2"></i>-->
+<!--                Khôi phục-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 {% endblock %}
 
@@ -164,7 +169,7 @@
             },
             order: [[2, 'desc']],
             ajax: {
-                url: "{% url 'sales:list-invoices' %}",
+                url: "{% url 'sales:list-invoices' store_name %}",
                 type: "POST",
                 data: function(d) {
                     d.invoiceStatus = $('input[name="status"]:checked').val();
@@ -225,6 +230,11 @@
         $('.form-check').on('click', function(e) {
             $('input[name="status"]').attr('checked', false);
             $(this).find("input[name='status']").attr('checked', true);
+            if ($('input[name="status"]:checked').val() == 0) {
+                $("#remove-btn").attr("hidden", true);
+            } else {
+                $("#remove-btn").attr("hidden", false);
+            }
             datatable.draw();
         });
     });
@@ -236,7 +246,7 @@
 
         if (r == true) {
             $.ajax({
-                url: `/invoices/invoice/${invoiceId}/`,
+                url: `invoice/${invoiceId}/`,
                 type: "PATCH",
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 data: {"status": 0},
@@ -255,7 +265,7 @@
     function restoreInvoice(ele) {
         const invoiceId = $(ele).attr("iid");
         $.ajax({
-            url: `/invoices/invoice/${invoiceId}/`,
+            url: `invoice/${invoiceId}/`,
             type: "PATCH",
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             data: {"status": 1},

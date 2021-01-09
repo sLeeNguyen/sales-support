@@ -45,7 +45,7 @@
             <ul style="display: none;">
                 <li><a href=""><i class="fas fa-chart-bar fa-fw mr-2"></i>Xem báo cáo cuối ngày</a></li>
                 <li><a href=""><i class="fa fa-recycle fa-fw mr-2"></i>Xử lý đặt hàng</a></li>
-                <li><a href="{% url 'core:dashboard' %}"><i class="fa fa-list-alt fa-fw mr-2"></i>Quản lý</a></li>
+                <li><a href="{% url 'core:dashboard' store_name %}"><i class="fa fa-list-alt fa-fw mr-2"></i>Quản lý</a></li>
                 <li><a href=""><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Đăng xuất</a></li>
             </ul>
         </div>
@@ -279,7 +279,7 @@
         }
 
         $.ajax({
-            url: "{% url 'sales:search' %}",
+            url: "{% url 'sales:search' store_name %}",
             method: 'GET',
             data: {
                 q: search_val
@@ -301,7 +301,7 @@
         }
 
         $.ajax({
-            url: "{% url 'sales:customer-search' %}",
+            url: "{% url 'sales:customer-search' store_name %}",
             method: 'GET',
             data: {
                 q: search_val
@@ -397,7 +397,7 @@
 
     function addOrder() {
         $.ajax({
-            url: "{% url 'sales:order-session' %}",
+            url: "{% url 'sales:order-session' store_name %}",
             method: 'POST',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             success: function (data) {
@@ -497,8 +497,12 @@
 
     function addCustomerToOrder(ele) {
         const cid = $(ele).attr("cid");
+        callAPIAddCustomerToOrder(cid);
+    }
+
+    function callAPIAddCustomerToOrder(cid) {
         $.ajax({
-            url: `/sales/cart/${cartId}/customer/`,
+            url: `cart/${cartId}/customer/`,
             method: "PATCH",
             headers: {'X-CSRFToken': '{{csrf_token}}'},
             data: {
@@ -517,7 +521,7 @@
 
     function removeCustomerFromOrder() {
         $.ajax({
-            url: `/sales/cart/${cartId}/customer/`,
+            url: `cart/${cartId}/customer/`,
             method: "DELETE",
             headers: {'X-CSRFToken': '{{csrf_token}}'},
             success: function() {

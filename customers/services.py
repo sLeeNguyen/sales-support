@@ -7,14 +7,16 @@ class CustomerManagement:
     _form = None
     _instance = None
     _request = None
+    _store = None
 
-    def __init__(self, request):
+    def __init__(self, request, store):
         self._request = request
+        self._store = store
 
     def validate_form(self):
         self._form = CustomerForm(self._request.POST, self._request.FILES)
         if self._form.is_valid():
-            customer = self._form.save()
+            customer = self._form.save(store=self._store)
             # save to elasticsearch
             extra_data = {}
             if customer.phone_number is not None:
@@ -27,6 +29,7 @@ class CustomerManagement:
                                          customer_code=customer.customer_code,
                                          customer_name=customer.customer_name,
                                          group_type=customer.group_type,
+                                         store_id=customer.store.id,
                                          **extra_data)
             self._instance = customer
             return self._instance
@@ -40,9 +43,8 @@ class CustomerManagement:
                 errors.append({'id': field.auto_id, 'error': error})
         return errors
 
-    @classmethod
-    def search_customer_by_key(cls, key):
-        es_result = elasticsearch.search_customer(key)
+    def search_customer_by_key(self, key):
+        es_result = elasticsearch.search_customer(key, store_id=self._store.id)
         return {
             "num_of_results": es_result["hits"]["total"]["value"],
             "list_customers": [hit["_source"] for hit in es_result["hits"]["hits"]]

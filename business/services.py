@@ -23,8 +23,9 @@ class ReportManagement:
     }
     time_format = "%Y-%m-%d"
 
-    def __init__(self, request):
+    def __init__(self, request, store):
         self.request = request
+        self.store = store
 
     def get_revenue_aggregations(self):
         time = self.request.GET.get("time", "today")
@@ -34,7 +35,8 @@ class ReportManagement:
         scripts = es.build_revenue_aggregation_scripts(group_name=group_by,
                                                        timezone=settings.TIME_ZONE,
                                                        from_time=from_time,
-                                                       to_time=to_time)
+                                                       to_time=to_time,
+                                                       store_id=self.store.id)
         filter_path = ["aggregations"]
         response = es.search(script=scripts, index="invoice", filter_path=filter_path)
         buckets = response["aggregations"][group_by]["buckets"]
@@ -58,7 +60,8 @@ class ReportManagement:
         scripts = es.build_top_product_aggregation_scripts(group_name=group_by,
                                                            timezone=settings.TIME_ZONE,
                                                            from_time=from_time,
-                                                           to_time=to_time)
+                                                           to_time=to_time,
+                                                           store_id=self.store.id)
         filter_path = ["aggregations"]
         response = es.search(script=scripts, index="product_item", filter_path=filter_path)
         print(response)

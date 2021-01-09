@@ -178,14 +178,14 @@ def index_customer(customer_id, customer_code, customer_name, group_type, store_
     return es.index(index="customer", body=body, id=customer_id)
 
 
-def bulk_index_product_item(list_product_items):
+def bulk_index_product_item(list_product_items, store_id=DEFAULT):
     actions = [
         {
             "_index": "product_item",
             "_id": item.id,
             "_source": {
                 "id": item.id,
-                "store_id": DEFAULT,
+                "store_id": store_id,
                 "order_id": item.order.id,
                 "product_id": item.product.id,
                 "product_name": item.product.product_name,
@@ -238,7 +238,8 @@ def build_revenue_aggregation_scripts(group_name, timezone, from_time, to_time, 
         "query": {
             "bool": {
                 "must": [
-                    {"term": {"store_id": store_id}}
+                    {"term": {"store_id": store_id}},
+                    {"term": {"status": 1}}
                 ],
                 "filter": {
                     "range": {
@@ -333,7 +334,10 @@ def build_top_product_aggregation_scripts(group_name, timezone, from_time, to_ti
 def aggregate_sales_today(yesterday, today_begin, today, last_month_begin, last_month,
                           timezone=settings.TIME_ZONE, store_id=DEFAULT):
     script = {
-        "query": {"bool": {"must": [{"term": {"store_id": store_id}}]}},
+        "query": {"bool": {"must": [
+            {"term": {"store_id": store_id}},
+            {"term": {"status": 1}}
+        ]}},
         "size": 0,
         "aggs": {
             "yesterday_today": {
@@ -396,13 +400,16 @@ def aggregate_sales_today(yesterday, today_begin, today, last_month_begin, last_
     }
 
 
-def search_customer(key):
+def search_customer(key, store_id=DEFAULT):
     query = {
         "query": {
             "dis_max": {
                 "tie_breaker": 0.7,
                 "boost": 1.2,
                 "queries": [
+                    {
+                        "match": {"store_id": store_id}
+                    },
                     {
                         "match": {
                             "customer_name": key
@@ -431,3 +438,16 @@ def search_customer(key):
     }
     filter_path = ["hits"]
     return search(script=query, index="customer", filter_path=filter_path)
+
+
+def update_invoice_status(invoice_id, new_status):
+    body = {
+        "script": {
+            "source": "ctx._source.status=params.new_status",
+            "lang": "painless",
+            "params": {
+                "new_status": new_status
+            }
+        }
+    }
+    es.update(index="invoice", id=invoice_id, body=body)

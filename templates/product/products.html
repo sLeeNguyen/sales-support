@@ -107,8 +107,8 @@
             </button>
         </div>
         <div class="operation-box ml-3">
-            <button id="continue-sell-btn" type="button" class="btn btn-danger px-3" title="Ngừng bán các sản phẩm đã chọn."
-                    data-toggle="tooltip" data-placement="bottom" hidden>
+            <button id="continue-sell-btn" type="button" class="btn btn-success px-3" data-toggle="tooltip"
+                    data-placement="bottom" hidden>
                 <i class="fas fa-ban mr-2"></i>
                 Tiếp tục bán
             </button>
@@ -185,7 +185,7 @@
             },
             order: [[2, 'asc']],
             ajax: {
-                url: "{% url 'products:warehouse' %}",
+                url: "{% url 'products:warehouse' store_name=store_name %}",
                 type: "POST",
                 data: function(d) {
                     d.productStatus = $('input[name="product-status"]:checked').val();
@@ -245,7 +245,7 @@
 
                 $('#partial-update-btn').on('click', function() {
                     $.ajax({
-                        url: "{% url 'products:product-update' %}" + id,
+                        url: "{% url 'products:product-update' store_name=store_name %}" + id,
                         type: "GET",
                         success: function(result) {
                             show(result);
@@ -279,7 +279,7 @@
                     let r = confirm("Ngừng bán sản phẩm này?");
                     if (r == true){
                         $.ajax({
-                            url: "{% url 'products:product-update' %}" + id,
+                            url: "{% url 'products:product-update' store_name=store_name %}" + id,
                             type: 'PATCH',
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}',
@@ -310,7 +310,7 @@
                     let r = confirm("Bạn chắc chắn xoá?");
                     if (r == true){
                         $.ajax({
-                            url: "{% url 'products:product-update' %}" + id,
+                            url: "{% url 'products:product-update' store_name=store_name %}" + id,
                             type: 'DELETE',
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}',
@@ -336,7 +336,7 @@
             $('#table_id tbody tr .p-field-info').on('click', function() {
                 let id = $(this).parent().attr('id');
                 $.ajax({
-                    url: "{% url 'products:product-detail' %}" + id,
+                    url: "{% url 'products:product-detail' store_name=store_name %}" + id,
                     type: "GET",
                     success: function(result) {
                         setUpPartialProductEvent(result, id);
@@ -362,7 +362,7 @@
             if (r == true) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{% url 'products:product-update' %}",
+                    url: "{% url 'products:product-update' store_name=store_name %}",
                     type: 'DELETE',
                     data: {
                         'list_ids': list_ids.toArray()
@@ -403,7 +403,7 @@
             if (r == true) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{% url 'products:product-update' %}",
+                    url: "{% url 'products:product-update' store_name=store_name %}",
                     type: 'PATCH',
                     data: {
                         'list_ids': list_ids.toArray(),
@@ -444,7 +444,7 @@
             if (r == true) {
                 e.preventDefault();
                 $.ajax({
-                    url: "{% url 'products:product-update' %}",
+                    url: "{% url 'products:product-update' store_name=store_name %}",
                     type: 'PATCH',
                     data: {
                         'list_ids': list_ids.toArray(),
@@ -474,7 +474,7 @@
             if (r == true){
                 var productId = $('#product-meta').attr('dataId');
                 $.ajax({
-                    url: "{% url 'products:product-update' %}" + productId,
+                    url: "{% url 'products:product-update' store_name=store_name %}" + productId,
                     type: 'DELETE',
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',
@@ -502,7 +502,7 @@
             if (r == true){
                 var productId = $('#product-meta').attr('dataId');
                 $.ajax({
-                    url: "{% url 'products:product-update' %}" + productId,
+                    url: "{% url 'products:product-update' store_name=store_name %}" + productId,
                     type: 'DELETE',
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',
@@ -555,7 +555,7 @@
     function showCategory(ele) {
         const cid = $(ele).attr("cid");
         $.ajax({
-            url: `/products/category/update/${cid}/`,
+            url: `/{{store_name}}/products/category/update/${cid}/`,
             method: "GET",
             success: function(data) {
                 show(data);
@@ -581,7 +581,7 @@
     }
 
     function addCategory() {
-        const url = "{% url 'products:category-creation' %}";
+        const url = "{% url 'products:category-creation' store_name=store_name %}";
         $.ajax({
             url: url,
             type: "GET",

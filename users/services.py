@@ -76,7 +76,7 @@ class RegisterUserAccount:
         return True
 
 
-def user_authentication(username, password):
+def user_authentication(username, password, store):
     user = authenticate(username=username, password=password)
     if user is None:
         raise AccountNotExistsError(
@@ -85,5 +85,9 @@ def user_authentication(username, password):
     if not user.is_active:
         raise AccountIsBlockedError(
             _("Tài khoản của bạn đang bị khoá.")
+        )
+    if not user.store or user.store.id != store.id:
+        raise AccountNotExistsError(
+            _("Tài khoản không chính xác.")
         )
     return user

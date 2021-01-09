@@ -152,6 +152,7 @@
 <script src="{% static 'core/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'core/vendor/chartjs/dist/Chart.min.js' %}"></script>
 <script type="text/javascript">
+    const storeName = "{{store_name}}";
     var numberFormat = new Intl.NumberFormat();
     var ctx = document.getElementById('revenueChart').getContext('2d');
     var revenueChart = new Chart(ctx, {
@@ -257,7 +258,7 @@
         const groupBy = $(".revenue-group-by ul li.selected").attr("value");
         const time = $("#revenue-select-time").val();
         $.ajax({
-            url: "{% url 'business:dash-report' %}",
+            url: "{% url 'business:dash-report' store_name=store_name %}",
             type: "GET",
             data: {
                 "time": time,
@@ -281,7 +282,7 @@
         const groupBy = $(".product-group-by ul li.selected").attr("value");
         const time = $("#top-product-select-time").val();
         $.ajax({
-            url: "{% url 'business:dash-report' %}",
+            url: "{% url 'business:dash-report' store_name=store_name %}",
             type: "GET",
             data: {
                 "time": time,

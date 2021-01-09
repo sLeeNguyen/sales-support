@@ -9,11 +9,15 @@ fields = ['product_code', 'product_name', 'sell_price', 'cost_price', 'available
 
 class ProductManagement:
 
-    @classmethod
-    def get_products_datatables(cls, post):
+    def __init__(self, request, store):
+        self._request = request
+        self._store = store
+
+    def get_products_datatables(self):
         """
         Get list products from database base on properties in POST request
         """
+        post = self._request.POST
         start = int(post['start'])
         end = start + int(post['length'])
         field_order = fields[int(post['order[0][column]']) - 1]
@@ -22,7 +26,9 @@ class ProductManagement:
         product_status = int(post.get('productStatus', 1))
         category_id = int(post.get('categoryId'))
 
-        results = Product.objects.filter(status=product_status)
+        results = Product.objects.filter(
+            store=self._store,
+            status=product_status)
 
         if category_id != 0:
             category = Category.objects.get(pk=category_id)

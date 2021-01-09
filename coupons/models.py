@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from stores.models import Store
+
 
 class Coupon(models.Model):
     SCOPE_CHOICES = [
@@ -22,3 +24,4 @@ class Coupon(models.Model):
     app_date = models.DateTimeField(default=timezone.now)
     exp_date = models.DateTimeField(blank=False, null=False)
     note = models.TextField(default='')
+    store = models.ForeignKey(to=Store, on_delete=models.CASCADE)

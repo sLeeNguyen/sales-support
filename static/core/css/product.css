@@ -189,6 +189,8 @@ i.fas.fa-info-circle {
 
 .img-show img {
     width: 100%;
+    max-height: 405px;
+    object-fit: fill;
 }
 
 .list-img-thumb .img-thumb {
@@ -207,6 +209,9 @@ i.fas.fa-info-circle {
 
 .list-img-thumb .img-thumb > img {
     width: 80px;
+    height: 65px;
+    object-fit: cover;
+
 }
 
 .bb-1 {

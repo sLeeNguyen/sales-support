@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from core.utils import client_timezone
 from customers.models import Customer
@@ -19,10 +20,12 @@ class SalesManagement:
     order = None
     invoice = None
     request = None
+    _store = None
 
-    def __init__(self, request, oid=None):
+    def __init__(self, request, store, oid=None):
         self.request = request
         self.__get_list_orders()
+        self._store = store
         if oid is not None:
             self.index, self.current_order = self.get_order_dict(oid)
             print(self.list_orders)
@@ -49,7 +52,7 @@ class SalesManagement:
                 customer = Customer.objects.get(pk=self.current_order["customer"]["id"])
             except ObjectDoesNotExist:
                 raise SalesException("Khách hàng '%s' không tồn tại!" % self.current_order["customer"]["name"])
-        order = Order(staff=self.request.user, status=status)
+        order = Order(staff=self.request.user, status=status, store=self._store)
         if note is not None:
             order.note = note
         if customer is not None:
@@ -71,7 +74,7 @@ class SalesManagement:
         order.save()
         Product.objects.bulk_update(products, fields=['available'])
         # save list items to elasticsearch
-        elasticsearch.bulk_index_product_item(order.get_list_product_items())
+        elasticsearch.bulk_index_product_item(order.get_list_product_items(), store_id=order.store.id)
         self.order = order
         return order
 
@@ -93,7 +96,8 @@ class SalesManagement:
                           discount=self.order.calc_discount(),
                           customer_given=customer_pay,
                           order=self.order,
-                          staff=self.request.user)
+                          staff=self.request.user,
+                          store=self._store)
         self.invoice = invoice.save()
         # save to elasticsearch
         elasticsearch.index_invoice(invoice_id=invoice.id,
@@ -103,7 +107,8 @@ class SalesManagement:
                                     time_created=client_timezone(invoice.time_create),
                                     staff=invoice.staff.username,
                                     order_id=invoice.order.id,
-                                    status=invoice.status)
+                                    status=invoice.status,
+                                    store_id=invoice.store.id)
         return invoice
 
     def add_product_to_order(self, product):
@@ -203,9 +208,12 @@ class SalesManagement:
 class TransactionManagement:
     request = None
     fields = ['invoice_code', 'time_create', 'customer_name', 'discount', 'total']
+    store = None
+    invoice = None
 
-    def __init__(self, request):
+    def __init__(self, request, store):
         self.request = request
+        self.store = store
 
     def get_invoices_datatables(self):
         post = self.request.POST
@@ -223,7 +231,10 @@ class TransactionManagement:
         aware_from_time = make_aware(datetime.strptime(from_time, time_format))
         aware_to_time = make_aware(datetime.strptime(to_time, time_format)) + timedelta(days=1)
 
-        results = Invoice.objects.filter(status=invoice_status, time_create__range=[aware_from_time, aware_to_time])
+        results = Invoice.objects.filter(
+            store=self.store,
+            status=invoice_status,
+            time_create__range=[aware_from_time, aware_to_time])
         if search_val:
             results = results.filter(
                 Q(invoice_code__icontains=search_val) |
@@ -253,6 +264,7 @@ class TransactionManagement:
         }
 
     def change_invoice_status(self, invoice_id, new_status):
-        invoice = Invoice.objects.get(pk=invoice_id)
-        invoice.status = new_status
-        invoice.save()
+        self.invoice = get_object_or_404(Invoice, pk=invoice_id)
+        self.invoice.status = new_status
+        elasticsearch.update_invoice_status(self.invoice.id, new_status)
+        self.invoice.save()
