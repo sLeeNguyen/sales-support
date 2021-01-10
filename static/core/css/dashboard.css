@@ -35,13 +35,21 @@ header {
     color: #0094da;
 }
 
-.logo-side > img {
+.logo-side img {
     height: 3.125rem;
 }
 
-.logo-side > span {
+.logo-side span {
     font-size: 0.85rem;
     margin-left: 5px;
+}
+
+.logo-side a {
+    color: #212529;
+}
+
+.logo-side a:hover {
+    text-decoration: none;
 }
 
 .additional-info {

@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from django.template.loader import render_to_string
 from django.views import View
@@ -13,16 +13,24 @@ from sales import services
 from sales.exceptions import OrderDoesNotExists, SalesException
 from sales.models import Invoice
 from sales.services import SalesManagement, TransactionManagement
+from stores.exceptions import UserNotInStoreException
+from stores.services import StoreManagement
 
 
 class SalesView(LoginRequire, View):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, store_name, *args, **kwargs):
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         request.session['orders'] = [{'id': 1, 'data': []}]
         customer_form = CustomerForm()
         context = {
             'oid': 1,
-            'form': customer_form
+            'form': customer_form,
+            'store_name': store_name
         }
         return render(request, template_name='sales/sales.html', context=context)
 
@@ -30,10 +38,15 @@ class SalesView(LoginRequire, View):
 class OrderSessionView(LoginRequire, View):
     service_class = SalesManagement
 
-    def get(self, request, oid):
+    def get(self, request, store_name, oid):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         oid = int(oid)
         try:
-            service = self.service_class(request, oid)
+            service = self.service_class(request, store, oid)
         except OrderDoesNotExists:
             return HttpResponse(status=400)
         index, order = service.get_order_dict()
@@ -47,7 +60,12 @@ class OrderSessionView(LoginRequire, View):
             response.update({"customer": order["customer"]})
         return JsonResponse(data=response, status=200)
 
-    def post(self, request):
+    def post(self, request, store_name):
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         orders = request.session['orders']
         if len(orders) == 15:
             response = {"status": "failed", "msg": "Không thể vượt quá 15 hoá đơn cùng lúc."}
@@ -67,10 +85,15 @@ class OrderSessionView(LoginRequire, View):
         request.session.modified = True
         return JsonResponse(data=response, status=200)
 
-    def delete(self, request, oid):
+    def delete(self, request, store_name, oid):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         oid = int(oid)
         try:
-            service = self.service_class(request, oid)
+            service = self.service_class(request, store, oid)
         except OrderDoesNotExists:
             return HttpResponse(status=400)
         service.remove_order_dict()
@@ -81,7 +104,12 @@ class OrderSessionView(LoginRequire, View):
 class OrderView(LoginRequire, View):
     service_class = SalesManagement
 
-    def post(self, request, oid):
+    def post(self, request, store_name, oid):
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         oid = int(oid)
         try:
             service = self.service_class(request, oid)
@@ -102,7 +130,12 @@ class OrderView(LoginRequire, View):
 
 
 class SearchProductView(LoginRequire, View):
-    def get(self, request):
+    def get(self, request, store_name):
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         query = request.GET.get('q')
         products = services.search_products(query)
         html = render(request, template_name='sales/product_search_item.html', context={'data': products})
@@ -112,9 +145,14 @@ class SearchProductView(LoginRequire, View):
 class SearchCustomerView(LoginRequire, View):
     service_class = CustomerManagement
 
-    def get(self, request):
+    def get(self, request, store_name):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         key_search = request.GET.get('q')
-        result = self.service_class.search_customer_by_key(key_search)
+        result = self.service_class(request, store).search_customer_by_key(key_search)
         if result["num_of_results"] == 0:
             context = {"empty": True}
         else:
@@ -137,9 +175,14 @@ class CartView(LoginRequire, View):
         # }
         # return JsonResponse(data=response, status=200)
 
-    def post(self, request, oid):
+    def post(self, request, store_name, oid):
         try:
-            service = self.service_class(request, oid)
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
+        try:
+            service = self.service_class(request, store, oid)
         except OrderDoesNotExists:
             return HttpResponse(status=404)
 
@@ -157,11 +200,16 @@ class CartView(LoginRequire, View):
         }
         return JsonResponse(response, status=200)
 
-    def patch(self, request, oid):
+    def patch(self, request, store_name, oid):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         pid = request.PATCH.get('productId')
         quantity = float(request.PATCH.get('quantity'))
         try:
-            service = self.service_class(request, oid)
+            service = self.service_class(request, store, oid)
             pdict = service.update_quantity_product_item(product_id=int(pid), quantity=quantity)
         except OrderDoesNotExists:
             return HttpResponse(status=404)
@@ -179,9 +227,14 @@ class CartView(LoginRequire, View):
         }
         return JsonResponse(data=response, status=200)
 
-    def delete(self, request, oid):
+    def delete(self, request, store_name, oid):
         try:
-            service = self.service_class(request, oid)
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
+        try:
+            service = self.service_class(request, store, oid)
         except OrderDoesNotExists:
             return HttpResponse(status=404)
         pid = request.DELETE.get('productId')
@@ -198,9 +251,14 @@ class CartView(LoginRequire, View):
 class OrderCustomerView(LoginRequire, View):
     service_class = SalesManagement
 
-    def patch(self, request, oid):
+    def patch(self, request, store_name, oid):
         try:
-            service = self.service_class(request, oid)
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
+        try:
+            service = self.service_class(request, store, oid)
         except OrderDoesNotExists:
             return HttpResponse(status=404)
         customer_id = request.PATCH.get("customerId")
@@ -213,9 +271,14 @@ class OrderCustomerView(LoginRequire, View):
         }
         return JsonResponse(data=response, status=200)
 
-    def delete(self, request, oid):
+    def delete(self, request, store_name, oid):
         try:
-            service = self.service_class(request, oid)
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
+        try:
+            service = self.service_class(request, store, oid)
             service.remove_customer()
             request.session.modified = True
         except OrderDoesNotExists:
@@ -227,15 +290,21 @@ class PaymentView(LoginRequire, View):
     service_class = SalesManagement
 
     def get(self, request, iid):
-        context = {}
-        return render(request, template_name="sales/invoice.html", context=context)
+        pass
+        # context = {}
+        # return render(request, template_name="sales/invoice.html", context=context)
 
-    def post(self, request, iid):
+    def post(self, request, store_name, iid):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         response = {
             "status": "failed"
         }
         try:
-            service = self.service_class(request=request, oid=iid)
+            service = self.service_class(request=request, store=store, oid=iid)
         except OrderDoesNotExists:
             return HttpResponse(status=404)
 
@@ -250,7 +319,8 @@ class PaymentView(LoginRequire, View):
         context = {
             "invoice": invoice,
             "list_product_items": invoice.order.get_list_product_items(),
-            "customer": invoice.order.customer
+            "customer": invoice.order.customer,
+            "store": store
         }
         html = render_to_string(template_name="sales/invoice.html", context=context)
         response["data"] = html
@@ -260,15 +330,26 @@ class PaymentView(LoginRequire, View):
 class InvoiceListView(LoginRequire, View):
     service_class = TransactionManagement
 
-    def get(self, request):
+    def get(self, request, store_name):
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         table_columns = ['', 'Mã hoá đơn', 'Thời gian', 'Khách hàng', 'Giảm giá', 'Tổng hoá đơn']
         context = {
-            "table_columns": table_columns
+            "table_columns": table_columns,
+            "active": "transactions",
+            "store_name": store_name
         }
         return render(request, template_name="invoice/invoice.html", context=context)
 
-    def post(self, request):
-        service = self.service_class(request)
+    def post(self, request, store_name):
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+        service = self.service_class(request, store)
         response = service.get_invoices_datatables()
         return JsonResponse(response)
 
@@ -277,22 +358,31 @@ class InvoiceDetailUpdateView(LoginRequire, View):
     service_class = TransactionManagement
     template_name = "invoice/invoice_detail.html"
 
-    def get(self, request, pk):
+    def get(self, request, store_name, pk):
         """
         Get invoice detail
-        :param request:
-        :param pk: the invoice's id
-        :return: A html represent for invoice
         """
-        invoice = get_object_or_404(Invoice, pk=pk)
-        return render(request, template_name=self.template_name, context={"invoice": invoice})
+        try:
+            StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
 
-    def patch(self, request, pk):
+        invoice = get_object_or_404(Invoice, pk=pk)
+        context = {
+            "invoice": invoice,
+            "store_name": store_name
+        }
+        return render(request, template_name=self.template_name, context=context)
+
+    def patch(self, request, store_name, pk):
         """
         Method for updating invoice status
         """
+        try:
+            store = StoreManagement.valid_store_user(store_name, request.user)
+        except UserNotInStoreException:
+            raise Http404()
+
         new_status = int(request.PATCH["status"])
-        invoice = get_object_or_404(Invoice, pk=pk)
-        invoice.status = new_status
-        invoice.save()
+        self.service_class(request, store).change_invoice_status(pk, new_status)
         return HttpResponse(200)

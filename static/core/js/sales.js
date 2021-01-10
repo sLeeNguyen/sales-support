@@ -52,7 +52,7 @@ function validateCustomerForm() {
                     });
                     $("#add-customer-modal").modal('hide');
                     form[0].reset();
-                    showCustomer(data.data);
+                    callAPIAddCustomerToOrder(data.data.id);
                 } else {
                     data.data.forEach(item => {
                         $(`#${item.id}`).addClass("is-invalid");

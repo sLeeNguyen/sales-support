@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from sales_support_website import constants
+from stores.models import Store
 
 
 class CustomerManager(models.Manager):
@@ -29,6 +30,7 @@ class Customer(models.Model):
     note = models.TextField(_("Ghi chú"), blank=True, default='')
     group_type = models.IntegerField(_("Nhóm"), default=0, choices=GROUP_CHOICES)
     points = models.PositiveIntegerField(_("Điểm tích luỹ"), blank=True, default=0)
+    store = models.ForeignKey(to=Store, on_delete=models.CASCADE)
 
     objects = CustomerManager()
 

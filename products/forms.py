@@ -28,6 +28,11 @@ class CategoryForm(forms.ModelForm):
                 )
         return category_name
 
+    def save(self, store=None, commit=True):
+        if store:
+            self.instance.store = store
+        return super(CategoryForm, self).save()
+
 
 class ProductForm(forms.ModelForm):
     product_code = forms.CharField(
@@ -119,7 +124,9 @@ class ProductForm(forms.ModelForm):
 
         return product_name
 
-    def save(self, commit=True):
+    def save(self, store=None, commit=True):
         if not self.instance.product_code:
-            self.instance.product_code = Product.objects.gen_default_code()
-        super(ProductForm, self).save()
+            self.instance.product_code = Product.objects.gen_default_code(store)
+        if store:
+            self.instance.store = store
+        return super(ProductForm, self).save()

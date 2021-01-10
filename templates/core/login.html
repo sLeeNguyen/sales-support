@@ -23,11 +23,13 @@
                 <img src="{% static 'core/images/sell-01.svg' %}" alt="IMG">
             </div>
             {% if next %}
-            <form class="login100-form validate-form" method="post" action="/login/?next={{next}}">
+            <form class="login100-form validate-form" method="post"
+                  action="{% url 'core:login' %}?next={{next}}">
             {% else %}
             <form class="login100-form validate-form" method="post" action="{% url 'core:login' %}">
             {% endif %}
                 {% csrf_token %}
+                <input type="text" value="{{store_name}}" name="storeName" hidden>
                 <span class="login100-form-title">
                     Đăng nhập
                 </span>

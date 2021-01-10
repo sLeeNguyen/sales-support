@@ -135,7 +135,7 @@
             },
             order: [[2, 'desc']],
             ajax: {
-                url: "{% url 'sales:list-invoices' %}",
+                url: "{% url 'sales:list-invoices' store_name %}",
                 type: "POST",
                 data: function(d) {
                     d.invoiceStatus = $('input[name="status"]:checked').val();
@@ -206,7 +206,7 @@
 
         if (r == true) {
             $.ajax({
-                url: `/invoices/invoice/${invoiceId}/`,
+                url: `/{{store_name}}/invoices/invoice/${invoiceId}/`,
                 type: "PATCH",
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 data: {"status": 0},
@@ -225,7 +225,7 @@
     function restoreInvoice(ele) {
         const invoiceId = $(ele).attr("iid");
         $.ajax({
-            url: `/invoices/invoice/${invoiceId}/`,
+            url: `/{{store_name}}/invoices/invoice/${invoiceId}/`,
             type: "PATCH",
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             data: {"status": 1},

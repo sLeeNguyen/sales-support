@@ -2,8 +2,8 @@
     <div class="nav-main col-md-9 row align-items-center">
         <div class="d-flex">
             <div class="nav-block">
-                {% if active == 'dashboard' %}<a href="{% url 'core:dashboard'%}" class="active">
-                {% else %}<a href="{% url 'core:dashboard'%}">{% endif %}
+                {% if active == 'dashboard' %}<a href="{% url 'core:dashboard' store_name=store_name %}" class="active">
+                {% else %}<a href="{% url 'core:dashboard' store_name=store_name %}">{% endif %}
                     <i class="fas fa-eye"></i>
                     <span>Tổng quan</span>
                 </a>
@@ -15,18 +15,19 @@
                     <span>Hàng hoá</span>
                 </a>
                 <div class="dropdown-nav">
-                    <a href="{% url 'products:warehouse' %}" >
+                    <a href="{% url 'products:warehouse' store_name=store_name %}" >
                         <i class="fas fa-th-list"></i>
                         <span>Kho hàng</span>
                     </a>
-                    <a href="{% url 'products:product-creation' %}" >
+                    <a href="{% url 'products:product-creation' store_name=store_name %}" >
                         <i class="fas fa-plus-circle"></i>
                         <span>Thêm hàng</span>
                     </a>
                 </div>
             </div>
             <div class="nav-block">
-                <a href="#">
+                {% if active == 'transactions' %}<a href="#" class="active">
+                {% else %}<a href="#">{% endif %}
                     <i class="fas fa-exchange-alt"></i>
                     <span>Giao dịch</span>
                 </a>
@@ -35,7 +36,7 @@
                         <i class="fas fa-box"></i>
                         <span>Đặt hàng</span>
                     </a>
-                    <a href="{% url 'sales:list-invoices' %}">
+                    <a href="{% url 'sales:list-invoices' store_name=store_name %}">
                         <i class="fas fa-file-invoice"></i>
                         <span>Hoá đơn</span>
                     </a>
@@ -79,7 +80,7 @@
     </div>
     <div class="nav-right col-md-3 row align-items-center justify-content-end">
         <div class="nav-block">
-            <a href="{% url 'sales:sales' %}">
+            <a href="{% url 'sales:sales' store_name=store_name %}">
                 <i class="fas fa-balance-scale-right"></i>
                 <span>Bán hàng</span>
             </a>

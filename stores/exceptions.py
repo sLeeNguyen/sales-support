@@ -1,0 +1,2 @@
+class UserNotInStoreException(Exception):
+    pass

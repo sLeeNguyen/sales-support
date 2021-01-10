@@ -4,6 +4,7 @@ from django.utils import timezone
 from core.utils import server_timezone
 from customers.models import Customer
 from coupons.models import Coupon
+from stores.models import Store
 from users.models import User
 from products.models import Product
 
@@ -11,8 +12,8 @@ from products.models import Product
 class InvoiceManager(models.Manager):
     prefix = 'HD'
 
-    def gen_default_code(self):
-        query_set = self.get_queryset()
+    def gen_default_code(self, store):
+        query_set = self.get_queryset().filter(store=store)
         postfix = str(query_set.count())
         return self.prefix + '0'*(6 - len(postfix)) + postfix
 
@@ -20,8 +21,8 @@ class InvoiceManager(models.Manager):
 class OrderManager(models.Manager):
     prefix = 'DH'
 
-    def gen_default_code(self):
-        query_set = self.get_queryset()
+    def gen_default_code(self, store):
+        query_set = self.get_queryset().filter(store=store)
         postfix = str(query_set.count())
         return self.prefix + '0'*(6 - len(postfix)) + postfix
 
@@ -41,6 +42,7 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, blank=True, null=True)
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     objects = OrderManager()
 
@@ -66,7 +68,7 @@ class Order(models.Model):
         if self.customer is not None:
             self.customer.points += self.calc_total_money() // 1000
             self.customer.save()
-        self.order_code = Order.objects.gen_default_code()
+        self.order_code = Order.objects.gen_default_code(self.store)
         super().save(force_insert, force_update, using, update_fields)
         self.save_list_items()
 
@@ -111,12 +113,13 @@ class Invoice(models.Model):
     discount = models.PositiveIntegerField(default=0, blank=True, null=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     staff = models.ForeignKey(User, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     objects = InvoiceManager()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.invoice_code = Invoice.objects.gen_default_code()
+        self.invoice_code = Invoice.objects.gen_default_code(self.store)
         super().save(force_insert, force_update, using, update_fields)
         return self
 

@@ -19,12 +19,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    url('^', include('core.urls')),
-    url(r'^', include('sales.urls')),
-    url(r'^', include('business.urls')),
-    url(r'^customers/', include('customers.urls')),
-    url(r'^products/', include('products.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^', include('core.urls')),
+    url(r'^', include('stores.urls')),
+    url(r'^(?P<store_name>[a-zA-Z0-9]+)/', include('sales.urls')),
+    url(r'^(?P<store_name>[a-zA-Z0-9]+)/', include('business.urls')),
+    url(r'^(?P<store_name>[a-zA-Z0-9]+)/customers/', include('customers.urls')),
+    url(r'^(?P<store_name>[a-zA-Z0-9]+)/products/', include('products.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

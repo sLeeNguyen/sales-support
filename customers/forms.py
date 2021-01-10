@@ -16,8 +16,13 @@ class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = "__all__"
+        exclude = ["store"]
         widgets = {
             'birthday': forms.DateInput(attrs={'type': 'date', 'class': 'datepicker'}),
             'note': forms.Textarea(attrs={"rows": 4})
         }
 
+    def save(self, store=None, commit=True):
+        if store:
+            self.instance.store = store
+        return super(CustomerForm, self).save()

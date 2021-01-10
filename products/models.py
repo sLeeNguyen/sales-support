@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+from stores.models import Store
+
 
 class ProductManager(models.Manager):
     prefix = 'SP'
@@ -14,8 +16,8 @@ class ProductManager(models.Manager):
         query_set = self.get_queryset()
         return query_set.filter(product_name=product_name)
 
-    def gen_default_code(self):
-        query_set = self.get_queryset()
+    def gen_default_code(self, store):
+        query_set = self.get_queryset().filter(store=store)
         postfix = str(query_set.filter(Q(product_code__startswith=self.prefix)).count())
         return self.prefix + '0'*(6 - len(postfix)) + postfix
 
@@ -23,6 +25,7 @@ class ProductManager(models.Manager):
 class Category(models.Model):
     category_name = models.CharField(_("Tên nhóm"), max_length=255, unique=True, blank=False, null=False)
     description = models.TextField(_("Mô tả"), default='', blank=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.category_name
@@ -61,6 +64,7 @@ class Product(models.Model):
     status = models.IntegerField(_('Trạng thái'), default=1, choices=STATUS_CHOICES)
     mfg = models.DateField(_('Ngày sản xuất'), blank=True, null=True)
     exp = models.DateField(_('Ngày hết hạn'), blank=True, null=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
     category = models.ForeignKey(verbose_name=_('Nhóm hàng'), to=Category, on_delete=models.CASCADE)
 

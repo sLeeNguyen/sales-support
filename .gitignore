@@ -129,8 +129,8 @@ dmypy.json
 .pyre/
 
 # other
-/stores
 /static/resource/images/
+/stores/migrations/00*
 /business/migrations/00*
 /core/migrations/00*
 /coupons/migrations/00*

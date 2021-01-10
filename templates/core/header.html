@@ -3,8 +3,10 @@
 <header>
 	<div class="row align-items-center">
 		<div class="logo-side col-md-5">
-			<img src="{% static 'core/images/vietnam.svg' %}">
-			<span class="font-bold">Việt Nam</span>
+			<a href="{% url 'stores:store' %}">
+				<img src="{% static 'core/images/vietnam.svg' %}">
+				<span class="font-bold">Việt Nam</span>
+			</a>
 		</div>
 		<div class="additional-info col-md-7 d-flex justify-content-end">
 			<div class="block d-flex justify-content-center align-items-center">
