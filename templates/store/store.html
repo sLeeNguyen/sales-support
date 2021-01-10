@@ -404,7 +404,7 @@
                 method: 'GET',
                 success: function (data) {
                     if (data.status == "success") {
-                        window.location.replace(`${data.url}`);
+                        window.location.replace(`${data.url}?next=/${data.store_name}/dashboard/`);
                     } else {
                         errorNotification({
                             title: "Lỗi",

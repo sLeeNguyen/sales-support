@@ -312,7 +312,7 @@
                 break;
             case "week":
                 let a = new Date();
-                from = new Date(a - (a.getDay() - 1)*24*3600*1000);
+                from = new Date(a - ((a.getDay() + 6)%7)*24*3600*1000);
                 to = new Date(from.getTime() + 6*24*3600*1000);
                 break;
             case "month":

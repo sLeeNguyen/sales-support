@@ -352,6 +352,7 @@ def aggregate_sales_today(yesterday, today_begin, today, last_month_begin, last_
                                 "min": yesterday,
                                 "max": today
                             },
+                            "time_zone": timezone,
                             "order": {
                                 "_key": "asc"
                             }
