@@ -1,0 +1,6 @@
+[client]
+database = "djangodatabase"
+host = localhost
+user = "root"
+password = "myproduct99"
+default-character-set = utf8

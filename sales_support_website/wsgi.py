@@ -19,6 +19,7 @@ application = get_wsgi_application()
 
 # Run elasticsearch index settings
 elasticsearch.init()
+elasticsearch.import_data()
 
 # set up default group
 setup()

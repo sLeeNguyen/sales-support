@@ -1,10 +1,14 @@
+import json
+import os
+
 from django.conf import settings
 from elasticsearch import Elasticsearch, helpers
 
-from core.utils import server_timezone
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEFAULT = 1
-es = Elasticsearch([{"host": "localhost", "port": 9200, "timeout": 60}])
+
+es = Elasticsearch([{"host": "es-django", "port": 9200, "timeout": 60}])
 
 default_settings = {
     "index": {
@@ -112,6 +116,12 @@ def init():
         es.indices.create(index='product', body=product_index_setting)
     if not es.indices.exists(index='customer'):
         es.indices.create(index='customer', body=customer_index_settings)
+
+
+def import_data():
+    with open(os.path.join(BASE_DIR, 'sample_data/es.json')) as es_json:
+        json_docs = json.load(es_json)
+        helpers.bulk(es, actions=json_docs)
 
 
 def index_invoice(invoice_id, invoice_code, total, total_product,
