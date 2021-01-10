@@ -269,6 +269,38 @@ table.dataTable tbody tr.selected {
     border-bottom: 2px solid #007dc5;
 }
 
+.user-expand {
+    position: absolute;
+    top: 90%;
+    background-color: var(--main-bg-color);
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,.08);
+    height: 70px;
+    border-radius: 5px;
+}
+
+.user-expand ul {
+    list-style: none;
+}
+
+.user-expand ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.user-expand ul li {
+    min-width: 150px;
+    padding: 10px;
+}
+
+.user-expand ul li:hover {
+    background-color: #0000002e;
+}
+
+.user-expand ul li:hover a {
+    color: white;
+}
+
 @media (min-width: 576px) {
     .nav-block {
         position: relative;

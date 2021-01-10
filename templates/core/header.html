@@ -13,9 +13,15 @@
 				<span class="user-display-name font-bold">Thiết lập</span>
 				<i class="fas fa-sliders-h"></i>
 			</div>
-			<div class="block d-flex justify-content-center align-items-center">
+			<div id="user-block" class="block d-flex justify-content-center align-items-center">
 				<span class="user-display-name font-bold">{{ user.get_display_name }}</span>
 				<i class="fas fa-user-circle"></i>
+				<div class="user-expand" style="display: none">
+					<ul>
+<!--						<li><a href=""><i class="fa fa-recycle fa-fw mr-2"></i>Xử lý đặt hàng</a></li>-->
+						<li><a href="{% url 'core:logout' %}"><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Đăng xuất</a></li>
+					</ul>
+				</div>
 			</div>
 			<div class="block d-flex justify-content-center align-items-center">
 				<i class="fas fa-bell ml-0 p-2"></i>

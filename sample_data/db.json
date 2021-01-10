@@ -20,7 +20,7 @@
     "pk": 1,
     "fields": {
       "password": "pbkdf2_sha256$216000$f00khMTLRbie$g2teGSLRVNyvUhDIx4h5nZ/mz7FvGwkT+AK10GWtFeM=",
-      "last_login": "2021-01-10T04:03:36.003Z",
+      "last_login": "2021-01-10T08:54:13.875Z",
       "is_superuser": false,
       "username": "smartmini",
       "display_name": null,
@@ -538,6 +538,15 @@
     }
   },
   {
+    "model": "products.category",
+    "pk": 7,
+    "fields": {
+      "category_name": "Thuốc lá",
+      "description": "",
+      "store": 1
+    }
+  },
+  {
     "model": "products.product",
     "pk": 1,
     "fields": {
@@ -631,6 +640,174 @@
       "exp": null,
       "store": 1,
       "category": 5
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "product_code": "SP000004",
+      "barcode": "8934626012203",
+      "product_name": "Hộp phở bò phố cổ",
+      "description": "Thực phẩm ăn liền",
+      "image1": "images/25.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 8000,
+      "sell_price": 10000,
+      "available": 25.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 3
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "product_code": "SP000005",
+      "barcode": "8936009052424",
+      "product_name": "Vinataba Slims",
+      "description": "",
+      "image1": "",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 8500,
+      "sell_price": 10000,
+      "available": 100.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": "2020-12-31",
+      "exp": "2021-02-05",
+      "store": 1,
+      "category": 7
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 7,
+    "fields": {
+      "product_code": "SP000006",
+      "barcode": "4023500005104",
+      "product_name": "Thuốc Marl đỏ",
+      "description": "",
+      "image1": "images/4.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 19000,
+      "sell_price": 22000,
+      "available": 100.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 7
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 8,
+    "fields": {
+      "product_code": "SP000007",
+      "barcode": "8934674013313",
+      "product_name": "Thuốc craven loại nhỏ",
+      "description": "",
+      "image1": "images/3.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 15000,
+      "sell_price": 17500,
+      "available": 120.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 7
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 9,
+    "fields": {
+      "product_code": "SP000008",
+      "barcode": "8935047600246",
+      "product_name": "Thăng long mềm",
+      "description": "",
+      "image1": "images/2.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 8000,
+      "sell_price": 10000,
+      "available": 120.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 7
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 10,
+    "fields": {
+      "product_code": "SP000009",
+      "barcode": "8936048470685",
+      "product_name": "Mì bò hầm cải chua Reeva hộp 100g",
+      "description": "",
+      "image1": "images/8936048470685_original.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 11000,
+      "sell_price": 15000,
+      "available": 50.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 3
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 11,
+    "fields": {
+      "product_code": "SP000010",
+      "barcode": "8934680025980",
+      "product_name": "Bánh AFC 200g",
+      "description": "",
+      "image1": "images/19.jpg",
+      "image2": "",
+      "image3": "",
+      "image4": "",
+      "image5": "",
+      "cost_price": 35000,
+      "sell_price": 40000,
+      "available": 43.0,
+      "unit": "INT",
+      "status": 1,
+      "mfg": null,
+      "exp": null,
+      "store": 1,
+      "category": 3
     }
   },
   {
@@ -1468,6 +1645,14 @@
     "fields": {
       "session_data": ".eJxVjDsOwjAQBe_iGln-JfZS0nMGa-3d4ACypTipEHeHSCmgfTPzXiLitpa4dV7iTOIstDj9bgnzg-sO6I711mRudV3mJHdFHrTLayN-Xg7376BgL98anEOls7EK2LExwUIa2CWttPUQnPFTZoYwEqSgfOCBPBJa6yZipFG8P76pN7I:1kyGje:vywo_EdOEfACL42Ct2I-RmiLZb1ubQwL1PeeXZM45e0",
       "expire_date": "2021-01-23T16:05:02.524Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "nusnmnn75n4blayoxp0jzwxqx59u4geu",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln-JfZS0nMGa-3d4ACypTipEHeHSCmgfTPzXiLitpa4dV7iTOIstDj9bgnzg-sO6I711mRudV3mJHdFHrTLayN-Xg7376BgL98anEOls7EK2LExwUIa2CWttPUQnPFTZoYwEqSgfOCBPBJa6yZipFG8P76pN7I:1kyWUH:MPamoc3lNhfnDKHzzjno8qk_upSxfNXoU2er2JBcTF8",
+      "expire_date": "2021-01-24T08:54:13.879Z"
     }
   },
   {

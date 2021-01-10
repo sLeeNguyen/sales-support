@@ -37,7 +37,7 @@ services:
   web:
     build: .
     command: |
-      bash -c "sleep 15 && python manage.py makemigrations && python manage.py migrate && \
+      bash -c "sleep 20 && python manage.py makemigrations && python manage.py migrate && \
       python manage.py loaddata sample_data/db.json && \
       python manage.py runserver 0.0.0.0:8000"
     ports:

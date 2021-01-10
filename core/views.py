@@ -3,7 +3,7 @@ from calendar import mdays
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect, Http404
 from django.views import View
 from django.utils.datastructures import MultiValueDictKeyError
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils import timezone
@@ -123,3 +123,8 @@ class DashBoardView(LoginRequire, View):
         }
         context.update(data_response)
         return render(request, template_name='core/dashboard.html', context=context)
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse("stores:store"))

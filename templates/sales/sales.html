@@ -46,7 +46,7 @@
                 <li><a href=""><i class="fas fa-chart-bar fa-fw mr-2"></i>Xem báo cáo cuối ngày</a></li>
                 <li><a href=""><i class="fa fa-recycle fa-fw mr-2"></i>Xử lý đặt hàng</a></li>
                 <li><a href="{% url 'core:dashboard' store_name %}"><i class="fa fa-list-alt fa-fw mr-2"></i>Quản lý</a></li>
-                <li><a href=""><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Đăng xuất</a></li>
+                <li><a href="{% url 'core:logout' %}"><i class="fas fa-sign-out-alt fa-fw mr-2"></i>Đăng xuất</a></li>
             </ul>
         </div>
     </div>

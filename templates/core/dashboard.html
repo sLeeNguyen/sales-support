@@ -31,13 +31,13 @@
                         <label class="dash_title">{{ today.total_invoices }} Hóa đơn</label>
                         <span class="number">{{ today.revenue|intcomma }}</span><span class="txt">Doanh thu thuần</span>
                     </li>
-                    <li class="return">
-                        <label class="dash_icon">
-                            <i class="fa fa-reply-all"></i>
-                        </label>
-                        <label class="dash_title">1 Hóa đơn</label>
-                        <span class="number">26,000</span><span class="txt">Doanh thu thuần</span>
-                    </li>
+<!--                    <li class="return">-->
+<!--                        <label class="dash_icon">-->
+<!--                            <i class="fa fa-reply-all"></i>-->
+<!--                        </label>-->
+<!--                        <label class="dash_title">1 Hóa đơn</label>-->
+<!--                        <span class="number">26,000</span><span class="txt">Doanh thu thuần</span>-->
+<!--                    </li>-->
                     {% if compare_with_yesterday %}
                         {% if compare_with_yesterday >= 0 %}
                         <li class="customer">
@@ -320,6 +320,16 @@
     $(document).ready(function () {
         loadRevenueData();
         loadTopProductData();
+
+        $("body").click(function(e) {
+            if ($(e.target).parent()[0] != $("#user-block")[0]) {
+                 $(".user-expand").fadeOut();
+            }
+        });
+
+        $("#user-block").click(function(e) {
+             $(".user-expand").fadeIn();
+        });
     });
 </script>
 {% endblock %}
