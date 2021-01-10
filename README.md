@@ -1,24 +1,18 @@
 # Sales management website
 
 ## Requires
-- Python 3.8
-- Django framework (version 3.1.2)
+- Docker, docker-compose
 
 ## Runs
-**Clone repository**
 
         git clone https://github.com/sLeeNguyen/sales-support.git
         cd sales-support
+        docker-compose up
         
-**Create virtualenv**
+Server will be running at 0.0.0.0:8000
 
-        python3 -m venv .
-        source venv/bin/activate
-        
-**Install libraries**
-
-        pip3 install -r requirements.txt 
-        
-**And run server**
-
-        python3 manage.py runserver
+_**Note**_: _Dữ liệu mẫu đặt trong thư mục **sample_data/** và được import tự động khi chạy
+Sử dụng: Truy cập đến trang web trên trình duyệt 0.0.0.0:8000, chọn đăng nhập:
+- Tên cửa hàng: smartmini
+- Tên tài khoản: smartmini
+- Mật khẩu: 123123

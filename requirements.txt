@@ -1,7 +1,11 @@
 asgiref==3.2.10
+certifi==2020.12.5
 Django==3.1.2
+django-mathfilters==1.0.0
 django-widget-tweaks==1.4.8
+elasticsearch==7.10.1
+mysqlclient==2.0.3
 Pillow==8.0.1
 pytz==2020.1
 sqlparse==0.4.1
-elasticsearch~=7.10.1
+urllib3==1.26.2

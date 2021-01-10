@@ -1,0 +1,425 @@
+[
+  {
+    "_index": "customer",
+    "_id": "2",
+    "_source": {
+      "id": 2,
+      "customer_code": "KH000001",
+      "customer_name": "Nguyễn Bá Ngọc",
+      "store_id": 1,
+      "group_type": 0,
+      "phone_number": "0868686868",
+      "address": "75 TCA",
+      "email": "ngoc.12@gmail.com"
+    }
+  },
+  {
+    "_index": "customer",
+    "_id": "3",
+    "_source": {
+      "id": 3,
+      "customer_code": "KH000001",
+      "customer_name": "Vương Văn An",
+      "store_id": 1,
+      "group_type": 0,
+      "phone_number": "023654789",
+      "address": "37 TC3B"
+    }
+  },
+  {
+    "_index": "customer",
+    "_id": "4",
+    "_source": {
+      "id": 4,
+      "customer_code": "KH000002",
+      "customer_name": "Vũ Tuyết",
+      "store_id": 1,
+      "group_type": 1,
+      "phone_number": "0888989898",
+      "address": "67 Trương Định"
+    }
+  },
+  {
+    "_index": "customer",
+    "_id": "5",
+    "_source": {
+      "id": 5,
+      "customer_code": "KH000003",
+      "customer_name": "Phương Anh",
+      "store_id": 1,
+      "group_type": 0,
+      "phone_number": "0868696465",
+      "address": "Trần Đại Nghĩa"
+    }
+  },
+  {
+    "_index": "customer",
+    "_id": "6",
+    "_source": {
+      "id": 6,
+      "customer_code": "KH000004",
+      "customer_name": "Mr Bean",
+      "store_id": 1,
+      "group_type": 0,
+      "phone_number": "0987654321",
+      "address": "98 ABC"
+    }
+  },
+  {
+    "_index": "customer",
+    "_id": "7",
+    "_source": {
+      "id": 7,
+      "customer_code": "KH000005",
+      "customer_name": "Dũng Vũ",
+      "store_id": 1,
+      "group_type": 0,
+      "address": "73 Thanh Nhàn"
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "2",
+    "_source": {
+      "id": 2,
+      "store_id": 1,
+      "invoice_code": "HD000001",
+      "time_created": "2021-01-09T20:55:22.994915+07:00",
+      "total": 291000,
+      "total_product": 20,
+      "staff": "smartmini",
+      "order_id": 2,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "5",
+    "_source": {
+      "id": 5,
+      "store_id": 1,
+      "invoice_code": "HD000004",
+      "time_created": "2021-01-09T22:14:59.974974+07:00",
+      "total": 375000,
+      "total_product": 7,
+      "staff": "smartmini",
+      "order_id": 5,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "9",
+    "_source": {
+      "id": 9,
+      "store_id": 1,
+      "invoice_code": "HD000008",
+      "time_created": "2021-01-10T00:53:36.657982+07:00",
+      "total": 320000,
+      "total_product": 6,
+      "staff": "smartmini",
+      "order_id": 9,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "6",
+    "_source": {
+      "id": 6,
+      "store_id": 1,
+      "invoice_code": "HD000005",
+      "time_created": "2021-01-09T22:26:11.012836+07:00",
+      "total": 7000,
+      "total_product": 1,
+      "staff": "smartmini",
+      "order_id": 6,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "7",
+    "_source": {
+      "id": 7,
+      "store_id": 1,
+      "invoice_code": "HD000006",
+      "time_created": "2021-01-09T22:27:23.718656+07:00",
+      "total": 55000,
+      "total_product": 1,
+      "staff": "smartmini",
+      "order_id": 7,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "4",
+    "_source": {
+      "id": 4,
+      "store_id": 1,
+      "invoice_code": "HD000003",
+      "time_created": "2021-01-09T22:13:16.575200+07:00",
+      "total": 9000,
+      "total_product": 1,
+      "staff": "smartmini",
+      "order_id": 4,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "8",
+    "_source": {
+      "id": 8,
+      "store_id": 1,
+      "invoice_code": "HD000007",
+      "time_created": "2021-01-09T23:07:02.755225+07:00",
+      "total": 7000,
+      "total_product": 1,
+      "staff": "smartmini",
+      "order_id": 8,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "3",
+    "_source": {
+      "id": 3,
+      "store_id": 1,
+      "invoice_code": "HD000002",
+      "time_created": "2021-01-09T22:00:25.909629+07:00",
+      "total": 73000,
+      "total_product": 3,
+      "staff": "smartmini",
+      "order_id": 3,
+      "status": 1
+    }
+  },
+  {
+    "_index": "invoice",
+    "_id": "1",
+    "_source": {
+      "id": 1,
+      "store_id": 1,
+      "invoice_code": "HD000000",
+      "time_created": "2021-01-09T20:49:29.989988+07:00",
+      "total": 200000,
+      "total_product": 4,
+      "staff": "smartmini",
+      "order_id": 1,
+      "status": 1
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "0SRo53YBIrPdYVdkvQ_r",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 1,
+      "product_id": 1,
+      "product_name": "Thịt bò khô Nhật Bảo",
+      "quantity": 4,
+      "price": 50000,
+      "time_created": "2021-01-09T13:49:29.938747+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "0iRu53YBIrPdYVdkIA_o",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 2,
+      "product_id": 1,
+      "product_name": "Thịt bò khô Nhật Bảo",
+      "quantity": 1,
+      "price": 50000,
+      "time_created": "2021-01-09T13:55:22.966128+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "0yRu53YBIrPdYVdkIA_o",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 2,
+      "product_id": 4,
+      "product_name": "Rượu men 500ml",
+      "quantity": 2,
+      "price": 55000,
+      "time_created": "2021-01-09T13:55:22.966128+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "1CRu53YBIrPdYVdkIA_o",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 2,
+      "product_id": 3,
+      "product_name": "TH true milk dâu 110ml",
+      "quantity": 11,
+      "price": 7000,
+      "time_created": "2021-01-09T13:55:22.966128+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "1SRu53YBIrPdYVdkIA_o",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 2,
+      "product_id": 2,
+      "product_name": "Yomost cam 180ml",
+      "quantity": 6,
+      "price": 9000,
+      "time_created": "2021-01-09T13:55:22.966128+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "1iSp53YBIrPdYVdkrg-r",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 3,
+      "product_id": 2,
+      "product_name": "Yomost cam 180ml",
+      "quantity": 2,
+      "price": 9000,
+      "time_created": "2021-01-09T15:00:25.873297+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "1ySp53YBIrPdYVdkrg-r",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 3,
+      "product_id": 4,
+      "product_name": "Rượu men 500ml",
+      "quantity": 1,
+      "price": 55000,
+      "time_created": "2021-01-09T15:00:25.873297+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "2CS153YBIrPdYVdkcQ8J",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 4,
+      "product_id": 2,
+      "product_name": "Yomost cam 180ml",
+      "quantity": 1,
+      "price": 9000,
+      "time_created": "2021-01-09T15:13:16.533449+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "2SS353YBIrPdYVdkBA_5",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 5,
+      "product_id": 1,
+      "product_name": "Thịt bò khô Nhật Bảo",
+      "quantity": 2,
+      "price": 50000,
+      "time_created": "2021-01-09T15:14:59.934991+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "2iS353YBIrPdYVdkBA_5",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 5,
+      "product_id": 4,
+      "product_name": "Rượu men 500ml",
+      "quantity": 5,
+      "price": 55000,
+      "time_created": "2021-01-09T15:14:59.934991+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "2yTB53YBIrPdYVdkQg8z",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 6,
+      "product_id": 3,
+      "product_name": "TH true milk dâu 110ml",
+      "quantity": 1,
+      "price": 7000,
+      "time_created": "2021-01-09T15:26:10.961631+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "3CTC53YBIrPdYVdkXg80",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 7,
+      "product_id": 4,
+      "product_name": "Rượu men 500ml",
+      "quantity": 1,
+      "price": 55000,
+      "time_created": "2021-01-09T15:27:23.677833+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "3STm53YBIrPdYVdkqw9a",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 8,
+      "product_id": 3,
+      "product_name": "TH true milk dâu 110ml",
+      "quantity": 1,
+      "price": 7000,
+      "time_created": "2021-01-09T16:07:02.730742+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "3iRI6HYBIrPdYVdkOw-C",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 9,
+      "product_id": 1,
+      "product_name": "Thịt bò khô Nhật Bảo",
+      "quantity": 2,
+      "price": 50000,
+      "time_created": "2021-01-09T17:53:36.619506+00:00"
+    }
+  },
+  {
+    "_index": "product_item",
+    "_id": "3yRI6HYBIrPdYVdkOw-C",
+    "_source": {
+      "id": null,
+      "store_id": 1,
+      "order_id": 9,
+      "product_id": 4,
+      "product_name": "Rượu men 500ml",
+      "quantity": 4,
+      "price": 55000,
+      "time_created": "2021-01-09T17:53:36.619506+00:00"
+    }
+  }
+]
