@@ -321,7 +321,7 @@ table.dataTable tbody tr.selected {
         float: none;
         width: auto;
         margin-left: calc(100% - 300px);
-        background-color: #292929;
+        /*background-color: #292929;*/
         height: 100px;
     }
 }
