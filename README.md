@@ -1,5 +1,7 @@
 # Sales management website
 
+**@Author:** Nguyen Ba Ngoc
+
 ## Requires
 - Docker, docker-compose
 
